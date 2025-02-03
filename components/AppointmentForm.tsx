@@ -66,7 +66,7 @@ const AppointmentForm = () => {
       lastname: "",
       phone_number: "",
       visit_type: "",
-      date: "",
+      date: new Date(),
     },
   })
  
