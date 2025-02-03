@@ -50,7 +50,7 @@ import {
     visit_type: z.string({
       required_error: "Por favor selecctione un tipo de visita.",
     }),
-    date: z.string({
+    date: z.date({
       required_error: "Por favor seleccione una fecha.",
     }),
   })
@@ -76,9 +76,10 @@ const AppointmentForm = () => {
     // ✅ This will be type-safe and validated.
     console.log(values)
   }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
           name="name"
@@ -134,7 +135,7 @@ const AppointmentForm = () => {
             <FormItem>
               <FormLabel>Tipo de visita</FormLabel>
               <FormControl>
-                <Select>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccione su visita" />
                     </SelectTrigger>
@@ -157,30 +158,37 @@ const AppointmentForm = () => {
         />
          <FormField
           control={form.control}
-          name="visit_type"
+          name="date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de visita</FormLabel>
+              {/* <FormLabel>Fecha</FormLabel> */}
               <FormControl>
                 <Popover>
                     <PopoverTrigger asChild>
                     <Button
                         variant={"outline"}
                         className={cn(
-                        "w-[280px] justify-start text-left font-normal",
+                        "w-[280px] justify-start text-left font-normal mt-6",
                         !date && "text-muted-foreground"
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4 text-white" />
-                        {date ? format(date, "PPP") : <span className='text-white'>Seleccione una fecha</span>}
+                        {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Seleccione una fecha</span>
+                      )}
                     </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
                     <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
+                         mode="single"
+                         selected={field.value}
+                         onSelect={field.onChange}
+                         disabled={(date) =>
+                           date < new Date() || date > new Date("2025-02-10")
+                         }
+                         initialFocus
                         />
                     </PopoverContent>
                 </Popover>
@@ -192,7 +200,7 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button className='!mt-6 !justify-end' type="submit">Agendar</Button>
       </form>
     </Form>
   )
