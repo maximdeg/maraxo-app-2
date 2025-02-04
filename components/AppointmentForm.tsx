@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react'
+import Link from 'next/link'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface OptionComponentMap {
+  [key: string]: JSX.Element;
+}
+
+interface SubmitedJson{
+  name: string,
+  lastname: string,
+  phone_number: string,
+  visit_type: string,
+  date: string,
+  consult_type: string,
+  time: string
+}
+
 
 
 const formSchema = z.object({
@@ -67,15 +87,6 @@ const AppointmentForm = () => {
   const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
   const [date, setDate] = useState<Date>()
   const [selectedOption, setSelectedOption] = useState<string>("");
-    
-  interface Option {
-    value: string;
-    label: string;
-  }
-  
-  interface OptionComponentMap {
-    [key: string]: JSX.Element;
-  }
 
     // ZOD form
     const form = useForm<z.infer<typeof formSchema>>({
@@ -106,8 +117,8 @@ const AppointmentForm = () => {
               <SelectContent>
                   <SelectGroup>
                   {/* <SelectLabel>Visita</SelectLabel> */}
-                  <SelectItem value="consulta">Primera vez</SelectItem>
-                  <SelectItem value="practica">Seguimiento</SelectItem>
+                  <SelectItem value="primera_vez">Primera vez</SelectItem>
+                  <SelectItem value="seguimiento">Seguimiento</SelectItem>
                   </SelectGroup>
               </SelectContent>
            </Select>
@@ -218,7 +229,7 @@ const AppointmentForm = () => {
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem className='flex flex-col my-6'>
+            <FormItem className='flex flex-col'>
               <FormLabel>Fecha</FormLabel>
               <FormControl>
                 <Popover>
@@ -227,7 +238,7 @@ const AppointmentForm = () => {
                         variant={"outline"}
                         className={cn(
                         "w-[280px] justify-start text-left font-normal mt-6",
-                        !date && "text-muted-foreground"
+                        !date && "text-white"
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4 text-white" />
@@ -265,7 +276,7 @@ const AppointmentForm = () => {
             <FormItem>
               <FormLabel>Horario</FormLabel>
               <FormControl>
-                <Select onValueChange={(value) => { handleSelectChange(value); field.onChange(value); }} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccione su horario" />
                     </SelectTrigger>
@@ -290,7 +301,9 @@ const AppointmentForm = () => {
           )}
         />
         <div className='flex justify-end'>
-          <Button className='bg-white text-black font-bold !mt-6 ' type="submit">Agendar</Button>
+          <Link href="/success">
+            <Button className='bg-white text-black font-bold !mt-6 hover:bg-white hover:text-[#eb8658] border border-white hover:border-3' type="submit">Agendar</Button>
+          </Link>
         </div>
       </form>
     </Form>
