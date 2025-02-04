@@ -37,40 +37,97 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-  const formSchema = z.object({
-    name: z.string().min(2, {
-      message: "El nombre debe tener al menos 2 caracteres.",
-    }),
-    lastname: z.string().min(2, {
-      message: "El apellido debe tener al menos 2 caracteres.",
-    }),
-    phone_number: z.string().min(2, {
-      message: "El número de teléfono debe tener 10 caracteres.",
-    }),
-    visit_type: z.string({
-      required_error: "Por favor selecctione un tipo de visita.",
-    }),
-    date: z.date({
-      required_error: "Por favor seleccione una fecha.",
-    }),
+
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "El nombre debe tener al menos 2 caracteres.",
+  }),
+  lastname: z.string().min(2, {
+    message: "El apellido debe tener al menos 2 caracteres.",
+  }),
+  phone_number: z.string().min(10, {
+    message: "El número de teléfono debe tener 10 caracteres.",
+  }),
+  visit_type: z.string({
+    required_error: "Por favor selecctione un tipo de visita.",
+  }),
+  date: z.date({
+    required_error: "Por favor seleccione una fecha.",
+  }),
+  consult_type: z.string({
+    required_error: "Por favor seleccione un tipo de consulta.",
+  }),
+  time: z.string({
+    required_error: "Por favor seleccione un horario.",
   })
+})
 
 const AppointmentForm = () => {
-        const [date, setDate] = useState<Date>()
+  const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
+  const [date, setDate] = useState<Date>()
+  const [selectedOption, setSelectedOption] = useState<string>("");
     
-    // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      lastname: "",
-      phone_number: "",
-      visit_type: "",
-      date: new Date(),
-    },
-  })
+  interface Option {
+    value: string;
+    label: string;
+  }
+  
+  interface OptionComponentMap {
+    [key: string]: JSX.Element;
+  }
+
+    // ZOD form
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        name: "",
+        lastname: "",
+        phone_number: "",
+        visit_type: "",
+        date: new Date(),
+        consult_type: "",
+        time: ""
+      },
+    })
+  
+  const OptionComponents: OptionComponentMap = {
+    consulta: <FormField
+    control={form.control}
+    name="consult_type"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Tipo de consulta</FormLabel>
+        <FormControl>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione su visita" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectGroup>
+                  {/* <SelectLabel>Visita</SelectLabel> */}
+                  <SelectItem value="consulta">Primera vez</SelectItem>
+                  <SelectItem value="practica">Seguimiento</SelectItem>
+                  </SelectGroup>
+              </SelectContent>
+           </Select>
+        </FormControl>
+        {/* <FormDescription>
+          This is your public display name.
+        </FormDescription> */}
+        <FormMessage />
+      </FormItem>
+    )}
+  />,
+    Practica: <div>Hidden component for Option 2</div>,
+  };
+
+
+
+  const handleSelectChange = (value: string) => {
+    setSelectedOption(value);
+  };
  
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -96,7 +153,7 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-         <FormField
+        <FormField
           control={form.control}
           name="lastname"
           render={({ field }) => (
@@ -112,7 +169,7 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-         <FormField
+        <FormField
           control={form.control}
           name="phone_number"
           render={({ field }) => (
@@ -135,7 +192,7 @@ const AppointmentForm = () => {
             <FormItem>
               <FormLabel>Tipo de visita</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={(value) => { handleSelectChange(value); field.onChange(value); }} defaultValue={field.value}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccione su visita" />
                     </SelectTrigger>
@@ -147,7 +204,7 @@ const AppointmentForm = () => {
                         <SelectItem value="peeling">Peeling</SelectItem>
                         </SelectGroup>
                     </SelectContent>
-                 </Select>
+                </Select>
               </FormControl>
               {/* <FormDescription>
                 This is your public display name.
@@ -156,12 +213,13 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-         <FormField
+        {OptionComponents[selectedOption]}
+        <FormField
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem>
-              {/* <FormLabel>Fecha</FormLabel> */}
+            <FormItem className='flex flex-col my-6'>
+              <FormLabel>Fecha</FormLabel>
               <FormControl>
                 <Popover>
                     <PopoverTrigger asChild>
@@ -182,13 +240,13 @@ const AppointmentForm = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
                     <Calendar
-                         mode="single"
-                         selected={field.value}
-                         onSelect={field.onChange}
-                         disabled={(date) =>
-                           date < new Date() || date > new Date("2025-02-10")
-                         }
-                         initialFocus
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date < new Date() || date > new Date("2025-02-10")
+                      }
+                      initialFocus
                         />
                     </PopoverContent>
                 </Popover>
@@ -200,7 +258,40 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-        <Button className='!mt-6 !justify-end' type="submit">Agendar</Button>
+         <FormField
+          control={form.control}
+          name="time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Horario</FormLabel>
+              <FormControl>
+                <Select onValueChange={(value) => { handleSelectChange(value); field.onChange(value); }} defaultValue={field.value}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccione su horario" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                        <SelectLabel>Horarios disponibles</SelectLabel>
+                        {times.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                        
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+              </FormControl>
+              {/* <FormDescription>
+                This is your public display name.
+              </FormDescription> */}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className='flex justify-end'>
+          <Button className='bg-white text-black font-bold !mt-6 ' type="submit">Agendar</Button>
+        </div>
       </form>
     </Form>
   )
