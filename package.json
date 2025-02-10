@@ -11,13 +11,13 @@
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@novu/echo": "^0.24.3-alpha.4",
+    "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-popover": "^1.1.5",
     "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-slot": "^1.1.1",
     "@reduxjs/toolkit": "^2.5.1",
     "@types/node": "20.6.2",
-    "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.1",
@@ -38,5 +38,8 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2",
     "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.8"
   }
 }

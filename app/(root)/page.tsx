@@ -1,18 +1,8 @@
 "use client"
 
-import Image from 'next/image';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-
-
-import CustomSelectButton from "@/components/CustomSelectButton"
 import AppointmentForm from '@/components/AppointmentForm';
 
-
-
-
 export default function Home() {
-
 
   return (
     <section className='flex flex-col py-5 px-10 mx-10 items-center'>

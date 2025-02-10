@@ -1,7 +1,7 @@
 "use client"
 
-import React from 'react'
-import Link from 'next/link'
+import type {JSX} from 'react'
+import { Check } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,7 @@ import {
     FormLabel,
     FormMessage,
   } from "@/components/ui/form"
-  import { useState } from 'react';
+  import React, { useState } from 'react';
 
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
@@ -37,6 +37,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+
+
 
 interface Option {
   value: string;
@@ -69,24 +83,24 @@ const formSchema = z.object({
   phone_number: z.string().min(10, {
     message: "El número de teléfono debe tener 10 caracteres.",
   }),
-  visit_type: z.string({
-    required_error: "Por favor selecctione un tipo de visita.",
-  }),
-  date: z.date({
-    required_error: "Por favor seleccione una fecha.",
-  }),
+  visit_type: z.string().nonempty("Por favor seleccione un tipo de visita."),
+  date: z.date().min(new Date(), { message: "Too old" }),
   consult_type: z.string({
     required_error: "Por favor seleccione un tipo de consulta.",
   }),
-  time: z.string({
-    required_error: "Por favor seleccione un horario.",
-  })
+  time: z.string().nonempty("Por favor seleccione un horario."),
 })
 
 const AppointmentForm = () => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const limitDay = new Date(tomorrow);
+  limitDay.setDate(tomorrow.getDate() + 7);
+  const [date, setDate] = useState(tomorrow);
   const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
-  const [date, setDate] = useState<Date>()
   const [selectedOption, setSelectedOption] = useState<string>("");
+  const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>()
 
     // ZOD form
     const form = useForm<z.infer<typeof formSchema>>({
@@ -143,6 +157,7 @@ const AppointmentForm = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
+   
   }
 
   return (
@@ -255,7 +270,7 @@ const AppointmentForm = () => {
                       selected={field.value}
                       onSelect={field.onChange}
                       disabled={(date) =>
-                        date < new Date() || date > new Date("2025-02-10")
+                        date < new Date() || date > limitDay
                       }
                       initialFocus
                         />
@@ -300,10 +315,30 @@ const AppointmentForm = () => {
             </FormItem>
           )}
         />
-        <div className='flex justify-end'>
-          <Link href="/success">
-            <Button className='bg-white text-black font-bold !mt-6 hover:bg-white hover:text-[#eb8658] border border-white hover:border-3' type="submit">Agendar</Button>
-          </Link>
+        <div className='flex justify-end py-6'>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button type="submit" variant="outline">Agendar</Button>
+            </DialogTrigger>
+            <DialogContent className="text-green-600 text-6xl sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className='flex gap-2 items-center'><Check/>Visita agendada con exito</DialogTitle>
+                <DialogDescription>
+                  Asegurese que toda la informacion es correcta
+                </DialogDescription>
+              </DialogHeader>
+             
+
+              
+              <DialogFooter className="justify-end">
+                <DialogClose asChild >
+                  <Button type="button" variant="secondary">
+                    Cerrar
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </form>
     </Form>
