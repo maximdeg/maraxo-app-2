@@ -49,6 +49,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { json } from 'node:stream/consumers'
 
 
 
@@ -84,7 +85,7 @@ const formSchema = z.object({
     message: "El número de teléfono debe tener 10 caracteres.",
   }),
   visit_type: z.string().nonempty("Por favor seleccione un tipo de visita."),
-  date: z.date().min(new Date(), { message: "Too old" }),
+  date: z.date().min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
   consult_type: z.string({
     required_error: "Por favor seleccione un tipo de consulta.",
   }),
@@ -130,7 +131,7 @@ const AppointmentForm = () => {
               </SelectTrigger>
               <SelectContent>
                   <SelectGroup>
-                  {/* <SelectLabel>Visita</SelectLabel> */}
+                  <SelectLabel>Consultas</SelectLabel>
                   <SelectItem value="primera_vez">Primera vez</SelectItem>
                   <SelectItem value="seguimiento">Seguimiento</SelectItem>
                   </SelectGroup>
@@ -152,11 +153,45 @@ const AppointmentForm = () => {
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
+
+  const clearForm = () => {
+    form.reset();
+  };
  
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
+
+    const AppointmentInfoComponent: React.ReactNode = (
+      <DialogHeader>
+        <DialogTitle>
+          <div>
+            <span className='font-light text-zinc-500'>Nombre: </span>
+            <span>{values.name} {values.lastname}</span>
+            <br/>
+            <span className='font-light text-zinc-500'>Telefono: </span>
+            <span>{values.phone_number}</span>
+            <br/>
+            <span className='font-light text-zinc-500'>Tipo de visita: </span>
+            <span>{values.visit_type}</span>
+            <br/>
+            {values.visit_type === "consulta" && <><span className='font-light text-zinc-500'>Tipo de consulta: </span>
+              <span>{values.consult_type}</span><br/></>}
+            <span className='font-light text-zinc-500'>Fecha: </span>
+            <span>{format(date, "dd/MM/yyyy")}</span>
+            <br/>
+            <span className='font-light text-zinc-500'>Horario: </span>
+            <span>{values.time}</span>
+            <br/>
+          </div>
+        </DialogTitle>
+      </DialogHeader>
+    )
+
+    setConfirmationInfo(AppointmentInfoComponent)
+    
+    clearForm();
    
   }
 
@@ -320,14 +355,14 @@ const AppointmentForm = () => {
             <DialogTrigger asChild>
               <Button type="submit" variant="outline">Agendar</Button>
             </DialogTrigger>
-            <DialogContent className="text-green-600 text-6xl sm:max-w-md">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle className='flex gap-2 items-center'><Check/>Visita agendada con exito</DialogTitle>
+                <DialogTitle className='flex gap-2 items-center text-green-600 text-2xl '><Check className='h-8 w-8'/>Visita agendada con exito</DialogTitle>
                 <DialogDescription>
                   Asegurese que toda la informacion es correcta
                 </DialogDescription>
               </DialogHeader>
-             
+             {confirmationInfo}
 
               
               <DialogFooter className="justify-end">
