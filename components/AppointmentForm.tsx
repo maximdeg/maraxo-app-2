@@ -41,31 +41,33 @@ interface OptionComponentMap {
 }
 
 interface SubmitedJson {
-    name: string;
-    lastname: string;
+    first_name: string;
+    last_name: string;
     phone_number: string;
     visit_type: string;
     date: string;
     consult_type: string;
-    time: string;
+    appointment_time: string;
 }
 
 const formSchema = z.object({
-    name: z.string().min(2, {
+    first_name: z.string().min(2, {
         message: "El nombre debe tener al menos 2 caracteres.",
     }),
-    lastname: z.string().min(2, {
+    last_name: z.string().min(2, {
         message: "El apellido debe tener al menos 2 caracteres.",
     }),
     phone_number: z.string().min(10, {
         message: "El número de teléfono debe tener 10 caracteres.",
     }),
     visit_type: z.string().nonempty("Por favor seleccione un tipo de visita."),
-    date: z.date().min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
+    appointment_date: z
+        .date()
+        .min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
     consult_type: z.string({
         required_error: "Por favor seleccione un tipo de consulta.",
     }),
-    time: z.string().nonempty("Por favor seleccione un horario."),
+    appointment_time: z.string().nonempty("Por favor seleccione un horario."),
 });
 
 const AppointmentForm = () => {
@@ -83,13 +85,13 @@ const AppointmentForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            lastname: "",
+            first_name: "",
+            last_name: "",
             phone_number: "",
             visit_type: "",
-            date: new Date(),
+            appointment_date: new Date(),
             consult_type: "",
-            time: "",
+            appointment_time: "",
         },
     });
 
@@ -163,7 +165,7 @@ const AppointmentForm = () => {
                     <div>
                         <span className="font-light text-zinc-500">Nombre: </span>
                         <span>
-                            {values.name} {values.lastname}
+                            {values.first_name} {values.last_name}
                         </span>
                         <br />
                         <span className="font-light text-zinc-500">Telefono: </span>
@@ -183,7 +185,7 @@ const AppointmentForm = () => {
                         <span>{format(date, "dd/MM/yyyy")}</span>
                         <br />
                         <span className="font-light text-zinc-500">Horario: </span>
-                        <span>{values.time}</span>
+                        <span>{values.appointment_time}</span>
                         <br />
                     </div>
                 </DialogTitle>
@@ -200,7 +202,7 @@ const AppointmentForm = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                 <FormField
                     control={form.control}
-                    name="name"
+                    name="first_name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Nombre</FormLabel>
@@ -216,7 +218,7 @@ const AppointmentForm = () => {
                 />
                 <FormField
                     control={form.control}
-                    name="lastname"
+                    name="last_name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Apellido</FormLabel>
@@ -283,7 +285,7 @@ const AppointmentForm = () => {
                 {OptionComponents[selectedOption]}
                 <FormField
                     control={form.control}
-                    name="date"
+                    name="appointment_date"
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
                             <FormLabel>Fecha</FormLabel>
@@ -325,7 +327,7 @@ const AppointmentForm = () => {
                 />
                 <FormField
                     control={form.control}
-                    name="time"
+                    name="appointment_time"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Horario</FormLabel>

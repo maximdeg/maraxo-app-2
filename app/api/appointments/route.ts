@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-// --- GET: /api/appointments ---
 export async function GET() {
     try {
         const appointments = await query(`
@@ -24,7 +23,6 @@ export async function GET() {
     }
 }
 
-// --- POST: /api/appointments ---
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();

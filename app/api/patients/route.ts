@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-// --- GET: /api/patients ---
 export async function GET() {
     try {
         const patients = await query("SELECT * FROM patients ORDER BY last_name, first_name");
@@ -12,7 +11,6 @@ export async function GET() {
     }
 }
 
-// --- POST: /api/patients ---
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
