@@ -1,7 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+interface patientId {
+    id: string;
+}
+
+export async function GET(req: NextRequest, { params }: { params: patientId }) {
     const appointmentId = params.id;
 
     try {
