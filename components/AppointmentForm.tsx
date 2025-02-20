@@ -61,9 +61,7 @@ const formSchema = z.object({
         message: "El número de teléfono debe tener 10 caracteres.",
     }),
     visit_type: z.string().nonempty("Por favor seleccione un tipo de visita."),
-    appointment_date: z
-        .date()
-        .min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
+    appointment_date: z.date().min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
     consult_type: z.string({
         required_error: "Por favor seleccione un tipo de consulta.",
     }),
@@ -77,7 +75,7 @@ const AppointmentForm = () => {
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 7);
     const [date, setDate] = useState(tomorrow);
-    const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+    const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
     const [selectedOption, setSelectedOption] = useState<string>("");
     const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
 
@@ -329,17 +327,10 @@ const AppointmentForm = () => {
                                     <PopoverTrigger asChild>
                                         <Button
                                             variant={"outline"}
-                                            className={cn(
-                                                "w-[280px] justify-start text-left font-normal mt-6",
-                                                !date && "text-white"
-                                            )}
+                                            className={cn("w-[280px] justify-start text-left font-normal mt-6", !date && "text-white")}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4 text-white" />
-                                            {field.value ? (
-                                                format(field.value, "PPP")
-                                            ) : (
-                                                <span>Seleccione una fecha</span>
-                                            )}
+                                            {field.value ? format(field.value, "PPP") : <span>Seleccione una fecha</span>}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0">
