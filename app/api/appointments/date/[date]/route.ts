@@ -5,7 +5,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<a
     const appointmentsDate = (await params).date;
 
     try {
-        console.log(appointmentsDate);
         const appointments = await query(
             `
             SELECT

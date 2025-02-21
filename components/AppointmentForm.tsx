@@ -94,7 +94,7 @@ const AppointmentForm = () => {
     });
 
     const OptionComponents: OptionComponentMap = {
-        consulta: (
+        1: (
             <FormField
                 control={form.control}
                 name="consult_type"

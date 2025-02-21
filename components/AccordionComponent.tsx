@@ -16,7 +16,7 @@ interface Appointment {
 const AccordionComponent = () => {
     const [date, setDate] = useState<Date>(new Date());
     const [loading, setLoading] = useState<Boolean>(true);
-    const [appointmentsList, setAppointmentsList] = useState<Appointment[]>([]); // or proper interface
+    const [appointmentsList, setAppointmentsList] = useState<Appointment[]>([]);
 
     const fetchAppointmentsByDate = useCallback(async () => {
         try {
@@ -29,7 +29,20 @@ const AccordionComponent = () => {
                 },
             });
 
+            if (response.status === 404) {
+                setAppointmentsList((prevState) => {
+                    return [];
+                });
+                setLoading(false);
+                return;
+            }
+
             if (!response.ok) {
+                console.log(JSON.stringify(response));
+                setLoading(false);
+                setAppointmentsList((prevState) => {
+                    return [];
+                });
                 throw new Error("Error fetching appointments");
             }
 
@@ -113,7 +126,7 @@ const AccordionItemList = memo(({ date, appointments }: { date: Date; appointmen
                             ))}
                         </div>
                     ) : (
-                        <p className="text-center text-gray-500">No hay citas para este día</p>
+                        <p className="text-center text-white">No hay citas para este día</p>
                     )}
                 </div>
             </AccordionContent>
