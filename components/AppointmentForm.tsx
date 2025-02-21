@@ -79,7 +79,6 @@ const AppointmentForm = () => {
     const [selectedOption, setSelectedOption] = useState<string>("");
     const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
 
-    // ZOD form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -196,28 +195,28 @@ const AppointmentForm = () => {
             <DialogHeader>
                 <DialogTitle>
                     <div>
-                        <span className="font-light text-zinc-500">Nombre: </span>
+                        <span className="font-extralight">Nombre: </span>
                         <span>
                             {values.first_name} {values.last_name}
                         </span>
                         <br />
-                        <span className="font-light text-zinc-500">Telefono: </span>
+                        <span className="font-extralight ">Telefono: </span>
                         <span>{values.phone_number}</span>
                         <br />
-                        <span className="font-light text-zinc-500">Tipo de visita: </span>
+                        <span className="font-extralight ">Tipo de visita: </span>
                         <span>{values.visit_type}</span>
                         <br />
                         {values.visit_type === "consulta" && (
                             <>
-                                <span className="font-light text-zinc-500">Tipo de consulta: </span>
+                                <span className="font-extralight ">Tipo de consulta: </span>
                                 <span>{values.consult_type}</span>
                                 <br />
                             </>
                         )}
-                        <span className="font-light text-zinc-500">Fecha: </span>
+                        <span className="font-extralight ">Fecha: </span>
                         <span>{format(date, "dd/MM/yyyy")}</span>
                         <br />
-                        <span className="font-light text-zinc-500">Horario: </span>
+                        <span className="font-extralight ">Horario: </span>
                         <span>{values.appointment_time}</span>
                         <br />
                     </div>
@@ -381,7 +380,7 @@ const AppointmentForm = () => {
                         </FormItem>
                     )}
                 />
-                <div className="flex justify-end py-6">
+                <div className="flex justify-end py-6 ">
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button type="submit" variant="outline">
@@ -390,11 +389,11 @@ const AppointmentForm = () => {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md">
                             <DialogHeader>
-                                <DialogTitle className="flex gap-2 items-center text-green-600 text-2xl ">
+                                <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
                                     <Check className="h-8 w-8" />
                                     Visita agendada con exito
                                 </DialogTitle>
-                                <DialogDescription>Asegurese que toda la informacion es correcta</DialogDescription>
+                                <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
                             </DialogHeader>
                             {confirmationInfo}
 
