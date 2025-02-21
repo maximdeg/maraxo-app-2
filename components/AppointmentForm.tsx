@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import React, { useState } from "react";
 
+import { es } from "date-fns/locale";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
@@ -329,7 +330,7 @@ const AppointmentForm = () => {
                                             className={cn("w-[280px] justify-start text-left font-normal mt-6", !date && "text-white")}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4 text-white" />
-                                            {field.value ? format(field.value, "PPP") : <span>Seleccione una fecha</span>}
+                                            {field.value ? format(field.value, "PPP", { locale: es }) : <span>Seleccione una fecha</span>}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0">
