@@ -29,13 +29,10 @@ export async function POST(req: NextRequest) {
 
         const result = await query(
             `INSERT INTO available_slots (work_schedule_id, start_time, end_time, is_available)
-             VALUES ($1, $2, $3, $4) RETURNING id`,
+            VALUES ($1, $2, $3, $4) RETURNING id`,
             [work_schedule_id, start_time, end_time, is_available]
         );
-        return NextResponse.json(
-            { message: "Available slot created successfully", id: result.rows[0].id },
-            { status: 201 }
-        );
+        return NextResponse.json({ message: "Available slot created successfully", id: result.rows[0].id }, { status: 201 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to create available slot" }, { status: 500 });

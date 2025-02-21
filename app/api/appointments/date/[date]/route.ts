@@ -1,16 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-interface RouteContext {
-    params: {
-        date: Date;
-    };
-}
-
-export async function GET(request: NextRequest, context: RouteContext) {
-    const appointmentsDate = context.params.date;
+export async function GET(_request: NextRequest, { params }: { params: Promise<any> }) {
+    const appointmentsDate = (await params).date;
 
     try {
+        console.log(appointmentsDate);
         const appointments = await query(
             `
             SELECT

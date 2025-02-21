@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const slotId = params.id;
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const slotId = (await params).id;
 
     try {
         const availableSlots = await query(
@@ -26,11 +26,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-    const slotId = params.id;
+export async function PUT(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const slotId = (await params).id;
 
     try {
-        const body = await req.json();
+        const body = await _request.json();
         const { work_schedule_id, start_time, end_time, is_available } = body;
 
         if (!work_schedule_id || !start_time || !end_time) {
@@ -52,8 +52,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-    const slotId = params.id;
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const slotId = (await params).id;
 
     try {
         const result = await query("DELETE FROM available_slots WHERE id = $1", [slotId]);
