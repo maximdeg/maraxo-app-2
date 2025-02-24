@@ -75,7 +75,7 @@ const AppointmentForm = () => {
     tomorrow.setDate(today.getDate() + 1);
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 7);
-    const [date, setDate] = useState(tomorrow);
+    const [date, setDate] = useState();
     const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
     const [selectedOption, setSelectedOption] = useState<string>("");
     const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
@@ -134,10 +134,63 @@ const AppointmentForm = () => {
         form.reset();
     };
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
+    const showModalInfo = (values: z.infer<typeof formSchema>) => {
+        const AppointmentInfoComponent: React.ReactNode = (
+            <div className="flex justify-end py-6 ">
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
+                            <Check className="h-8 w-8" />
+                            Visita agendada con exito
+                        </DialogTitle>
+                        <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
+                    </DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle>
+                            <div className="items-start border-2 border-red-500">
+                                <span className="font-extralight">Nombre: </span>
+                                <span>
+                                    {values.first_name} {values.last_name}
+                                </span>
+                                <br />
+                                <span className="font-extralight ">Telefono: </span>
+                                <span>{values.phone_number}</span>
+                                <br />
+                                <span className="font-extralight ">Tipo de visita: </span>
+                                <span>{values.visit_type}</span>
+                                <br />
+                                {values.visit_type === "consulta" && (
+                                    <>
+                                        <span className="font-extralight ">Tipo de consulta: </span>
+                                        <span>{values.consult_type}</span>
+                                        <br />
+                                    </>
+                                )}
+                                <span className="font-extralight ">Fecha: </span>
+                                <span>{format(values.appointment_date, "dd/MM/yyyy")}</span>
+                                <br />
+                                <span className="font-extralight ">Horario: </span>
+                                <span>{values.appointment_time}</span>
+                                <br />
+                            </div>
+                        </DialogTitle>
+                    </DialogHeader>
 
+                    <DialogFooter className="justify-end">
+                        <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                                Cerrar
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </div>
+        );
+
+        setConfirmationInfo(AppointmentInfoComponent);
+    };
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const patientResponse = await fetch("/api/patients", {
                 method: "POST",
@@ -172,8 +225,6 @@ const AppointmentForm = () => {
                 notes: null,
             };
 
-            console.dir(appointmentJSON);
-
             const response = await fetch("/api/appointments", {
                 method: "POST",
                 headers: {
@@ -184,6 +235,8 @@ const AppointmentForm = () => {
 
             if (response.ok) {
                 console.log("🟢 Appointment booked successfully!");
+                showModalInfo(values);
+                clearForm();
             } else {
                 const errorData = await response.json();
                 console.log(`🔴 Booking failed: ${errorData.error || "Unknown error"}`);
@@ -191,43 +244,6 @@ const AppointmentForm = () => {
         } catch (error) {
             console.error("🟠 Fetch error:", error);
         }
-
-        const AppointmentInfoComponent: React.ReactNode = (
-            <DialogHeader>
-                <DialogTitle>
-                    <div>
-                        <span className="font-extralight">Nombre: </span>
-                        <span>
-                            {values.first_name} {values.last_name}
-                        </span>
-                        <br />
-                        <span className="font-extralight ">Telefono: </span>
-                        <span>{values.phone_number}</span>
-                        <br />
-                        <span className="font-extralight ">Tipo de visita: </span>
-                        <span>{values.visit_type}</span>
-                        <br />
-                        {values.visit_type === "consulta" && (
-                            <>
-                                <span className="font-extralight ">Tipo de consulta: </span>
-                                <span>{values.consult_type}</span>
-                                <br />
-                            </>
-                        )}
-                        <span className="font-extralight ">Fecha: </span>
-                        <span>{format(date, "dd/MM/yyyy")}</span>
-                        <br />
-                        <span className="font-extralight ">Horario: </span>
-                        <span>{values.appointment_time}</span>
-                        <br />
-                    </div>
-                </DialogTitle>
-            </DialogHeader>
-        );
-
-        setConfirmationInfo(AppointmentInfoComponent);
-
-        clearForm();
     }
 
     return (
@@ -381,33 +397,14 @@ const AppointmentForm = () => {
                         </FormItem>
                     )}
                 />
-                <div className="flex justify-end py-6 ">
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button type="submit" variant="outline">
-                                Agendar
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                                <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
-                                    <Check className="h-8 w-8" />
-                                    Visita agendada con exito
-                                </DialogTitle>
-                                <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
-                            </DialogHeader>
-                            {confirmationInfo}
-
-                            <DialogFooter className="justify-end">
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                        Cerrar
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button type="submit" variant="outline">
+                            Agendar
+                        </Button>
+                    </DialogTrigger>
+                    {confirmationInfo}
+                </Dialog>
             </form>
         </Form>
     );

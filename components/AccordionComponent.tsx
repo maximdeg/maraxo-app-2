@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 
 interface Appointment {
     id: string;
@@ -72,8 +73,18 @@ const AccordionComponent = () => {
             <AccordionItem value="item-1">
                 <AccordionTrigger className="text-2xl ">Calendario</AccordionTrigger>
                 <AccordionContent>
-                    <div className="mx-4 space-y-1">
-                        <Calendar mode="single" selected={date} onSelect={handleDateChange} className="w-full rounded-md border place-items-center" />
+                    <div className="mx-4">
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={handleDateChange}
+                            className="w-full border-t-[1px] border-r-[1px] border-l-[1px] rounded-t-lg place-items-center"
+                        />
+                    </div>
+                    <div className="flex justify-end w-full mx-4 border-b-[1px] border-r-[1px] border-l-[1px] rounded-b-lg">
+                        <Button variant="ghost" className="mr-6 mt-4">
+                            Editar dia
+                        </Button>
                     </div>
                 </AccordionContent>
             </AccordionItem>

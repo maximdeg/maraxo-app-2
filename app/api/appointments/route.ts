@@ -3,7 +3,8 @@ import { query } from "@/lib/db";
 
 export async function GET() {
     try {
-        const appointments = await query(`
+        const appointments = await query(
+            `
             SELECT
                 a.*,
                 p.first_name as patient_first_name,
@@ -15,7 +16,8 @@ export async function GET() {
             LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
             LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
             ORDER BY a.appointment_date, a.appointment_time
-        `);
+        `
+        );
         return NextResponse.json(appointments.rows, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
@@ -38,10 +40,7 @@ export async function POST(req: NextRequest) {
             [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes]
         );
 
-        return NextResponse.json(
-            { message: "Appointment created successfully", id: result.rows[0].id },
-            { status: 201 }
-        );
+        return NextResponse.json({ message: "Appointment created successfully", id: result.rows[0].id }, { status: 201 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
