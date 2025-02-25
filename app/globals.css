@@ -20,7 +20,7 @@ body {
 
 @layer base {
   :root {
-    --background: #BB8C84 0% 100%;
+    --background: #a97f77 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;

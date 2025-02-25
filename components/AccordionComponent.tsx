@@ -4,6 +4,9 @@ import React, { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Appointment {
     id: string;
@@ -73,18 +76,52 @@ const AccordionComponent = () => {
             <AccordionItem value="item-1">
                 <AccordionTrigger className="text-2xl ">Calendario</AccordionTrigger>
                 <AccordionContent>
-                    <div className="mx-4">
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={handleDateChange}
-                            className="w-full border-t-[1px] border-r-[1px] border-l-[1px] rounded-t-lg place-items-center"
-                        />
-                    </div>
-                    <div className="flex justify-end w-full mx-4 border-b-[1px] border-r-[1px] border-l-[1px] rounded-b-lg">
-                        <Button variant="ghost" className="mr-6 mt-4">
-                            Editar dia
-                        </Button>
+                    <div className="w-full px-4">
+                        <div>
+                            <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={handleDateChange}
+                                className="w-full border-t-[1px] border-r-[1px] border-l-[1px] rounded-t-lg place-items-center"
+                            />
+                        </div>
+
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="flex justify-end w-full border-b-[1px] border-r-[1px] border-l-[1px] rounded-b-lg">
+                                    <Button variant="outline" className="m-4">
+                                        Editar dia
+                                    </Button>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Editar dia</DialogTitle>
+                                    <DialogDescription className="text-white">
+                                        Haz los cambios de tu dia aca. Incluido deshabilitar el dia e ingresar tus horas laborales.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">
+                                            Desde
+                                        </Label>
+                                        <Input id="name" value="12:00" className="col-span-3" />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="username" className="text-right">
+                                            Hasta
+                                        </Label>
+                                        <Input id="username" value="15:00" className="col-span-3" />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit" variant="outline">
+                                        Guardar cambios
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </AccordionContent>
             </AccordionItem>

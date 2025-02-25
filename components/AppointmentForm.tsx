@@ -136,55 +136,53 @@ const AppointmentForm = () => {
 
     const showModalInfo = (values: z.infer<typeof formSchema>) => {
         const AppointmentInfoComponent: React.ReactNode = (
-            <div className="flex justify-end py-6 ">
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
-                            <Check className="h-8 w-8" />
-                            Visita agendada con exito
-                        </DialogTitle>
-                        <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
-                    </DialogHeader>
-                    <DialogHeader>
-                        <DialogTitle>
-                            <div className="items-start border-2 border-red-500">
-                                <span className="font-extralight">Nombre: </span>
-                                <span>
-                                    {values.first_name} {values.last_name}
-                                </span>
-                                <br />
-                                <span className="font-extralight ">Telefono: </span>
-                                <span>{values.phone_number}</span>
-                                <br />
-                                <span className="font-extralight ">Tipo de visita: </span>
-                                <span>{values.visit_type}</span>
-                                <br />
-                                {values.visit_type === "consulta" && (
-                                    <>
-                                        <span className="font-extralight ">Tipo de consulta: </span>
-                                        <span>{values.consult_type}</span>
-                                        <br />
-                                    </>
-                                )}
-                                <span className="font-extralight ">Fecha: </span>
-                                <span>{format(values.appointment_date, "dd/MM/yyyy")}</span>
-                                <br />
-                                <span className="font-extralight ">Horario: </span>
-                                <span>{values.appointment_time}</span>
-                                <br />
-                            </div>
-                        </DialogTitle>
-                    </DialogHeader>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
+                        <Check className="h-8 w-8" />
+                        Visita agendada con exito
+                    </DialogTitle>
+                    <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
+                </DialogHeader>
+                <DialogHeader>
+                    <DialogTitle>
+                        <div className="items-start border-2 border-red-500">
+                            <span className="font-extralight">Nombre: </span>
+                            <span>
+                                {values.first_name} {values.last_name}
+                            </span>
+                            <br />
+                            <span className="font-extralight ">Telefono: </span>
+                            <span>{values.phone_number}</span>
+                            <br />
+                            <span className="font-extralight ">Tipo de visita: </span>
+                            <span>{values.visit_type}</span>
+                            <br />
+                            {values.visit_type === "consulta" && (
+                                <>
+                                    <span className="font-extralight ">Tipo de consulta: </span>
+                                    <span>{values.consult_type}</span>
+                                    <br />
+                                </>
+                            )}
+                            <span className="font-extralight ">Fecha: </span>
+                            <span>{format(values.appointment_date, "dd/MM/yyyy")}</span>
+                            <br />
+                            <span className="font-extralight ">Horario: </span>
+                            <span>{values.appointment_time}</span>
+                            <br />
+                        </div>
+                    </DialogTitle>
+                </DialogHeader>
 
-                    <DialogFooter className="justify-end">
-                        <DialogClose asChild>
-                            <Button type="button" variant="secondary">
-                                Cerrar
-                            </Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </div>
+                <DialogFooter className="justify-end">
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                            Cerrar
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
         );
 
         setConfirmationInfo(AppointmentInfoComponent);
@@ -397,14 +395,16 @@ const AppointmentForm = () => {
                         </FormItem>
                     )}
                 />
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button type="submit" variant="outline">
-                            Agendar
-                        </Button>
-                    </DialogTrigger>
-                    {confirmationInfo}
-                </Dialog>
+                <div className="flex justify-end py-6 ">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button type="submit" variant="outline">
+                                Agendar
+                            </Button>
+                        </DialogTrigger>
+                        {confirmationInfo}
+                    </Dialog>
+                </div>
             </form>
         </Form>
     );
