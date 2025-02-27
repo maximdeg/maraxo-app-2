@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {Switch} from "@/components/ui/switch"
 
 interface Appointment {
     id: string;
@@ -102,6 +103,15 @@ const AccordionComponent = () => {
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
+                                    <div className="p-5 border-2 items-center">
+                                        <Label className="text-right text-lg">Deshabilitar dia</Label>
+                                        <div className="flex justify-end">
+                                            <Switch 
+                    //                         checked={field.value}
+                    //   onCheckedChange={field.onChange}
+                                             />
+                                        </div>
+                                    </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="name" className="text-right">
                                             Desde
