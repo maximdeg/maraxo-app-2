@@ -5,9 +5,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
-import {Switch} from "@/components/ui/switch"
+import { Switch } from "@/components/ui/switch";
 
 interface Appointment {
     id: string;
@@ -20,6 +22,7 @@ interface Appointment {
 
 const AccordionComponent = () => {
     const [date, setDate] = useState<Date>(new Date());
+    const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
     const [loading, setLoading] = useState<Boolean>(true);
     const [appointmentsList, setAppointmentsList] = useState<Appointment[]>([]);
 
@@ -95,34 +98,60 @@ const AccordionComponent = () => {
                                     </Button>
                                 </div>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Editar dia</DialogTitle>
+                            <DialogContent className="sm:max-w-[425px] ">
+                                <DialogHeader className="text-start">
+                                    <DialogTitle className="text-xl">Editar dia</DialogTitle>
                                     <DialogDescription className="text-white">
                                         Haz los cambios de tu dia aca. Incluido deshabilitar el dia e ingresar tus horas laborales.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                    <div className="p-5 border-2 items-center">
-                                        <Label className="text-right text-lg">Deshabilitar dia</Label>
-                                        <div className="flex justify-end">
-                                            <Switch 
-                    //                         checked={field.value}
-                    //   onCheckedChange={field.onChange}
-                                             />
+                                    <div className="flex p-5 border rounded-lg justify-between">
+                                        <Label className="text-right text-lg mx-3">Deshabilitar dia</Label>
+                                        <Switch
+                                            className="mt-[0.2rem] mx-3"
+                                            //                         checked={field.value}
+                                            //   onCheckedChange={field.onChange}
+                                        />
+                                    </div>
+                                    <div className="p-5 border rounded-lg  gap-2">
+                                        <Label className="text-lg mx-3">Horarios de trabajo</Label>
+                                        <div className="flex justify-around mt-3">
+                                            <div className="w-[100px]">
+                                                <Select>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="De" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectLabel>Horarios disponibles</SelectLabel>
+                                                            {times.map((time) => (
+                                                                <SelectItem key={time} value={time}>
+                                                                    {time}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="w-[100px]">
+                                                <Select>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Hasta" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectLabel>Horarios disponibles</SelectLabel>
+                                                            {times.map((time) => (
+                                                                <SelectItem key={time} value={time}>
+                                                                    {time}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="name" className="text-right">
-                                            Desde
-                                        </Label>
-                                        <Input id="name" value="12:00" className="col-span-3" />
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="username" className="text-right">
-                                            Hasta
-                                        </Label>
-                                        <Input id="username" value="15:00" className="col-span-3" />
                                     </div>
                                 </div>
                                 <DialogFooter>
