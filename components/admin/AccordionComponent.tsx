@@ -1,61 +1,32 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { AppointmentInfo } from "@/lib/types";
 import SelectTimeComponent from "./SelectTimeComponent";
 import AccordionItemList from "./AccordionItemList";
+import { getAppointments } from "@/lib/actions";
 
 const AccordionComponent = () => {
     const [date, setDate] = useState<Date>(new Date());
-    const [loading, setLoading] = useState<Boolean>(true);
-    const [appointmentsList, setAppointmentsList] = useState<AppointmentInfo[]>([]);
 
-    const fetchAppointmentsByDate = useCallback(async () => {
-        try {
-            setLoading(true);
+    const {
+        data: appointments,
+        isError,
+        isPending,
+        isLoading,
+    } = useQuery({
+        queryKey: ["appointments", { date }],
+        queryFn: async () => {
             const formatedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-            const response = await fetch(`/api/appointments/date/${formatedDate}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (response.status === 404) {
-                setAppointmentsList((prevState) => {
-                    return [];
-                });
-                setLoading(false);
-                return;
-            }
-
-            if (!response.ok) {
-                console.log(JSON.stringify(response));
-                setLoading(false);
-                setAppointmentsList((prevState) => {
-                    return [];
-                });
-                throw new Error("Error fetching appointments");
-            }
-
-            const data = await response.json();
-            setAppointmentsList(data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    }, [date]);
-
-    useEffect(() => {
-        fetchAppointmentsByDate();
-    }, [fetchAppointmentsByDate]);
+            return await getAppointments(formatedDate);
+        },
+    });
 
     const handleDateChange = (newDate: Date | undefined) => {
         if (newDate) {
@@ -63,7 +34,7 @@ const AccordionComponent = () => {
         }
     };
 
-    const memoizedAccordionItemList = useMemo(() => <AccordionItemList date={date} appointments={appointmentsList} />, [date, appointmentsList]);
+    const memoizedAccordionItemList = useMemo(() => <AccordionItemList date={date} appointments={appointments} />, [date, appointments]);
 
     return (
         <Accordion type="single" collapsible>
@@ -126,7 +97,7 @@ const AccordionComponent = () => {
                     </div>
                 </AccordionContent>
             </AccordionItem>
-            {loading ? (
+            {isLoading ? (
                 <AccordionItem value="item-2">
                     <AccordionTrigger>
                         <h1>Cargando...</h1>
