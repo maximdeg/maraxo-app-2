@@ -1,28 +1,20 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState, memo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-
-interface Appointment {
-    id: string;
-    status: string;
-    appointment_time: string;
-    patient_first_name: string;
-    patient_last_name: string;
-    visit_type_name: string | null;
-}
+import { AppointmentInfo } from "@/lib/types";
+import SelectTimeComponent from "./SelectTimeComponent";
+import AccordionItemList from "./AccordionItemList";
 
 const AccordionComponent = () => {
     const [date, setDate] = useState<Date>(new Date());
-    const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
     const [loading, setLoading] = useState<Boolean>(true);
-    const [appointmentsList, setAppointmentsList] = useState<Appointment[]>([]);
+    const [appointmentsList, setAppointmentsList] = useState<AppointmentInfo[]>([]);
 
     const fetchAppointmentsByDate = useCallback(async () => {
         try {
@@ -116,38 +108,10 @@ const AccordionComponent = () => {
                                         <Label className="text-lg mx-3">Horarios de trabajo</Label>
                                         <div className="flex justify-around mt-3">
                                             <div className="w-[100px]">
-                                                <Select>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="De" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectGroup>
-                                                            <SelectLabel>Horarios disponibles</SelectLabel>
-                                                            {times.map((time) => (
-                                                                <SelectItem key={time} value={time}>
-                                                                    {time}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectGroup>
-                                                    </SelectContent>
-                                                </Select>
+                                                <SelectTimeComponent />
                                             </div>
                                             <div className="w-[100px]">
-                                                <Select>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Hasta" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectGroup>
-                                                            <SelectLabel>Horarios disponibles</SelectLabel>
-                                                            {times.map((time) => (
-                                                                <SelectItem key={time} value={time}>
-                                                                    {time}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectGroup>
-                                                    </SelectContent>
-                                                </Select>
+                                                <SelectTimeComponent />
                                             </div>
                                         </div>
                                     </div>
@@ -174,50 +138,6 @@ const AccordionComponent = () => {
         </Accordion>
     );
 };
-
-const AccordionItemList = memo(({ date, appointments }: { date: Date; appointments: Appointment[] }) => {
-    const days = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
-    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-    return (
-        <AccordionItem value="item-2">
-            <AccordionTrigger>
-                {days[date?.getDay() || 0]} {date?.getDate()} de {months[date?.getMonth() || 0]}
-            </AccordionTrigger>
-            <AccordionContent>
-                <div className="flex flex-col gap-4">
-                    <div className="text-center">
-                        <h1 className="text-2xl">Visitas</h1>
-                        <h2 className="text-lg">
-                            {days[date?.getDay() || 0]} {date?.getDate()} de {months[date?.getMonth() || 0]}
-                        </h2>
-                    </div>
-                    {appointments.length > 0 ? (
-                        <div className="space-y-2">
-                            {appointments.map((appointment) => (
-                                <div key={appointment.id} className="p-4 border rounded-lg shadow-sm">
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-semibold">
-                                                {appointment.patient_first_name} {appointment.patient_last_name}
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                                {appointment.appointment_time} - {appointment.visit_type_name}
-                                            </p>
-                                        </div>
-                                        <span className="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">{appointment.status}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-white">No hay citas para este día</p>
-                    )}
-                </div>
-            </AccordionContent>
-        </AccordionItem>
-    );
-});
 
 AccordionItemList.displayName = "AccordionItemList";
 

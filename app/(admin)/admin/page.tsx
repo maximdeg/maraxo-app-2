@@ -1,16 +1,14 @@
-"use client"
+"use client";
 
-import React from 'react'
-import AccordionComponent from '@/components/AccordionComponent'
-
+import React from "react";
+import AccordionComponent from "@/components/admin/AccordionComponent";
 
 const page = () => {
+    return (
+        <div className="p-5">
+            <AccordionComponent />
+        </div>
+    );
+};
 
-  return (
-    <div className='p-5'>
-        <AccordionComponent/>
-    </div>
-  )
-}
-
-export default page
+export default page;

@@ -1,6 +1,4 @@
-"use client";
-
-import AppointmentForm from "@/components/AppointmentForm";
+import AppointmentForm from "@/components/root/AppointmentForm";
 
 export default function Home() {
     return (

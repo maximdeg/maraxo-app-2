@@ -1,6 +1,6 @@
 import React from "react";
-import AdminHeader from "@/components/AdminHeader";
-import AdminFooter from "@/components/AdminFooter";
+import AdminHeader from "@/components/admin/AdminHeader";
+import AdminFooter from "@/components/admin/AdminFooter";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
