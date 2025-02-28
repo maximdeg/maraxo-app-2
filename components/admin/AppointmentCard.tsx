@@ -1,9 +1,10 @@
 import React from "react";
 import { AppointmentInfo } from "@/lib/types";
+import { Button } from "../ui/button";
 
 const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
     return (
-        <div key={appointment.id} className="p-4 border rounded-lg shadow-sm">
+        <div key={appointment.id} className="group p-4 border rounded-lg shadow-sm flex flex-col">
             <div className="flex justify-between items-center">
                 <div>
                     <p className="font-semibold">
@@ -14,6 +15,11 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                     </p>
                 </div>
                 <span className="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">{appointment.status}</span>
+            </div>
+            <div className="hidden pt-2 self-end group-focus-within:flex">
+                <Button className="!h-7" variant="destructive">
+                    Cancelar visita
+                </Button>
             </div>
         </div>
     );
