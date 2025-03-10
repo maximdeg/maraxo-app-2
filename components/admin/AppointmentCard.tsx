@@ -17,7 +17,7 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                 <span className="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">{appointment.status}</span>
             </div>
             <div className="hidden pt-2 self-end group-focus-within:flex">
-                <Button className="!h-7" variant="destructive">
+                <Button className="!h-7" variant="destructive" aria-label="Cancelar visita">
                     Cancelar visita
                 </Button>
             </div>

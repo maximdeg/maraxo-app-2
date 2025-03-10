@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import DialogComponent from "./DialogComponent"
+import DialogComponent from "./DialogComponent";
 import AccordionItemList from "./AccordionItemList";
 import { getAppointments } from "@/lib/actions";
 
@@ -46,7 +46,7 @@ const AccordionComponent = () => {
                                 className="w-full border-t-[1px] border-r-[1px] border-l-[1px] rounded-t-lg place-items-center"
                             />
                         </div>
-                       <DialogComponent/>
+                        <DialogComponent />
                     </div>
                 </AccordionContent>
             </AccordionItem>
