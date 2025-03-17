@@ -20,7 +20,9 @@ const AccordionComponent = () => {
         queryKey: ["appointments", { date }],
         queryFn: async () => {
             const formatedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-            return await getAppointments(formatedDate);
+            const data = await getAppointments(formatedDate);
+
+            return data ? data : [];
         },
     });
 

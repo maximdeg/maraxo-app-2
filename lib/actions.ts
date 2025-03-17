@@ -2,8 +2,6 @@
 
 export const getAppointments = async (date: string) => {
     try {
-        // const formatedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-
         const response = await fetch(`http://localhost:3000/api/appointments/date/${date}`, {
             method: "GET",
             headers: {
