@@ -33,6 +33,7 @@ const AccordionComponent = () => {
     };
 
     const memoizedAccordionItemList = useMemo(() => <AccordionItemList date={date} appointments={appointments} />, [date, appointments]);
+    const memoizedDialogComponent = useMemo(() => <DialogComponent selectedDate={date} />, [date]);
 
     return (
         <Accordion type="single" collapsible>
@@ -48,7 +49,7 @@ const AccordionComponent = () => {
                                 className="w-full border-t-[1px] border-r-[1px] border-l-[1px] rounded-t-lg place-items-center"
                             />
                         </div>
-                        <DialogComponent selectedDate={date} />
+                        {memoizedDialogComponent}
                     </div>
                 </AccordionContent>
             </AccordionItem>

@@ -19,11 +19,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { work_schedule_id, unavailable_date, is_confirmed } = body;
+        const { unavailable_date, is_confirmed } = body;
 
-        if (!work_schedule_id || !unavailable_date) {
+        if (!unavailable_date) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
+
+        const work_schedule_id: number = 2;
+        console.log("🟠", work_schedule_id);
 
         const result = await query(
             `INSERT INTO unavailable_days (work_schedule_id, unavailable_date, is_confirmed)

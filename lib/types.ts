@@ -6,3 +6,8 @@ export interface AppointmentInfo {
     patient_last_name: string;
     visit_type_name: string | null;
 }
+
+export interface UnavailableDay {
+    unavailable_date: Date;
+    is_confirmed: boolean;
+}
