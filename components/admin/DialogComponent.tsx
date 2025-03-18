@@ -1,4 +1,7 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getUnavailableDay } from "@/lib/actions";
+
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -6,7 +9,22 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import SelectTimeComponent from "./SelectTimeComponent";
 
-const DialogComponent = () => {
+const DialogComponent = ({ selectedDate }: { selectedDate: Date }) => {
+    const {
+        data: unavailableDate,
+        isError,
+        isPending,
+        isLoading,
+    } = useQuery({
+        queryKey: ["unavailableDate", { selectedDate }],
+        queryFn: async () => {
+            const formatedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+            const data = await getUnavailableDay(formatedDate);
+
+            return data ? data : [];
+        },
+    });
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -26,11 +44,7 @@ const DialogComponent = () => {
                 <div className="grid gap-4 py-4">
                     <div className="flex p-5 border rounded-lg justify-between">
                         <Label className="text-right text-lg mx-3">Deshabilitar dia</Label>
-                        <Switch
-                            className="mt-[0.2rem] mx-3"
-                            //                         checked={field.value}
-                            //   onCheckedChange={field.onChange}
-                        />
+                        <Switch className="mt-[0.2rem] mx-3" defaultChecked={unavailableDate?.length > 0 ? unavailableDate[0].is_confirmed : false} />
                     </div>
                     <div className="p-5 border rounded-lg  gap-2">
                         <Label className="text-lg mx-3">Horarios de trabajo</Label>
