@@ -123,4 +123,7 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
     );
 });
 
+DialogComponent.displayName = 'DialogComponent';
+
+
 export default DialogComponent;

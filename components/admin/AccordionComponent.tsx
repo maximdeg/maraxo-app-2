@@ -66,6 +66,6 @@ const AccordionComponent = () => {
     );
 };
 
-AccordionItemList.displayName = "AccordionItemList";
+AccordionComponent.displayName = "AccordionComponent";
 
 export default AccordionComponent;

@@ -23,7 +23,7 @@ const AccordionItemList = memo(({ date, appointments }: { date: Date; appointmen
                     {appointments.length > 0 ? (
                         <div className="space-y-2">
                             {appointments.map((appointment: AppointmentInfo) => (
-                                <AppointmentCard appointment={appointment} />
+                                <AppointmentCard key={appointment.id} appointment={appointment} />
                             ))}
                         </div>
                     ) : (
@@ -34,5 +34,7 @@ const AccordionItemList = memo(({ date, appointments }: { date: Date; appointmen
         </AccordionItem>
     );
 });
+
+AccordionItemList.displayName = "AccordionItemList";
 
 export default AccordionItemList;
