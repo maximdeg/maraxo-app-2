@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
         }
 
         const work_schedule_id: number = 2;
-        console.log("🟠", work_schedule_id);
 
         const result = await query(
             `INSERT INTO unavailable_days (work_schedule_id, unavailable_date, is_confirmed)

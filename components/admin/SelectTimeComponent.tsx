@@ -1,12 +1,12 @@
 import React from "react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 
-const SelectTimeComponent = ({ placeholderText }: { placeholderText: string }) => {
+const SelectTimeComponent = ({ placeholderText, isDisabled }: { placeholderText: string; isDisabled: boolean }) => {
     const times = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
     return (
-        <Select>
-            <SelectTrigger className="w-full">
+        <Select disabled={isDisabled}>
+            <SelectTrigger className={isDisabled ? "w-full border-gray-700" : "w-full"}>
                 <SelectValue placeholder={placeholderText} />
             </SelectTrigger>
             <SelectContent>
