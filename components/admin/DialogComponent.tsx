@@ -1,9 +1,18 @@
 import React, { memo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { addUnavailableDay, getUnavailableDay } from "@/lib/actions";
+import { addUnavailableDay, getUnavailableDay, addUnavailableTime } from "@/lib/actions";
 
 import SelectTimeComponent from "./SelectTimeComponent";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
@@ -13,6 +22,10 @@ import { Loader2 } from "lucide-react";
 const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
     const [isDayOff, setIsDayOff] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [firstDayOffState, setFirstDayOffState] = useState(false);
+    const [endTime, setEndTime] = useState("");
+    const [startTime, setStartTime] = useState("");
 
     const {
         data: unavailableDate,
@@ -26,6 +39,7 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
             const data = await getUnavailableDay(formatedDate);
 
             setIsDayOff(data?.is_confirmed);
+            setFirstDayOffState(data?.is_confirmed);
             return data ? data : [];
         },
     });
@@ -34,16 +48,13 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
         mutationFn: async (variables: { selectedDate: Date; isDayOff: boolean }) => {
             return addUnavailableDay(variables.selectedDate, variables.isDayOff);
         },
-    });
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsSaving(true);
-        try {
-            const response = await addUnavailableDayMutation({ selectedDate, isDayOff });
-
-            console.log(response);
-
+        onMutate: () => {
+            // Handle Mutation?
+        },
+        onSettled: () => {
+            setIsOpen(false);
+        },
+        onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
                 description: `La fecha ${selectedDate} fue editada correctamente.`,
                 action: {
@@ -52,8 +63,87 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
                 },
                 duration: 10000,
             });
-        } catch (error) {
+        },
+        onError: () => {
+            toast.warning("No se ha editado el dia.");
+        },
+    });
+
+    const { mutateAsync: addUnavailableTimeMutation } = useMutation({
+        mutationFn: async (variables: { selectedDate: Date; start_time: string; end_time: string }) => {
+            return addUnavailableTime(variables.selectedDate, variables.start_time, variables.end_time);
+        },
+        onMutate: () => {
+            // Handle Mutation?
+        },
+        onSettled: () => {
+            setIsOpen(false);
+        },
+        onSuccess: () => {
+            toast.success("Se guardo tus horarios exitosamente.", {
+                description: `La fecha ${selectedDate.toLocaleDateString("es-AR", {
+                    year: "2-digit",
+                    month: "2-digit",
+                    day: "2-digit",
+                })} se trabajara de ${startTime} a ${endTime}.`,
+                action: {
+                    label: "OK",
+                    onClick: () => console.log("OK"),
+                },
+                duration: 10000,
+            });
+
+            setStartTime("");
+            setEndTime("");
+        },
+        onError: () => {
+            // Handle error
+        },
+    });
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setIsSaving(true);
+
+        try {
+            if (isDayOff !== firstDayOffState) {
+                const responseDay = await addUnavailableDayMutation({ selectedDate, isDayOff });
+            }
+            // toast.success("Se guardo tu dia exitosamente.", {
+            //     description: `La fecha ${selectedDate} fue editada correctamente.`,
+            //     action: {
+            //         label: "OK",
+            //         onClick: () => console.log("OK"),
+            //     },
+            //     duration: 10000,
+            // });
+            // } else {
+            //     // toast.warning("No se ha editado el dia.");
+            // }
+
+            if (!isDayOff && (startTime === "" || endTime === "")) {
+                const responseTime = await addUnavailableTimeMutation({ selectedDate, start_time: startTime, end_time: endTime });
+            }
+            //     // toast.success("Se guardo tus horarios exitosamente.", {
+            //     //     description: `La fecha ${selectedDate.toLocaleDateString("es-AR", {
+            //     //         year: "2-digit",
+            //     //         month: "2-digit",
+            //     //         day: "2-digit",
+            //     //     })} se trabajara de ${startTime} a ${endTime}.`,
+            //     //     action: {
+            //     //         label: "OK",
+            //     //         onClick: () => console.log("OK"),
+            //     //     },
+            //     //     duration: 10000,
+            //     // });
+            // } else {
+            //     toast.warning("No se ha editado el dia.");
+            // }
+        } catch (error: any) {
             console.log(error);
+            toast.error("Ocurrió un error", {
+                description: error.message,
+            });
             setIsSaving(false);
         } finally {
             setIsSaving(false);
@@ -64,8 +154,16 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
         setIsDayOff(() => e);
     };
 
+    const handleStartTimeChange = (startTime: string) => {
+        setStartTime(startTime);
+    };
+
+    const handleEndTimeChange = (endTime: string) => {
+        setEndTime(endTime);
+    };
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <div className="flex justify-end w-full border-b-[1px] border-r-[1px] border-l-[1px] rounded-b-lg">
                     <Button variant="outline" className="m-4" disabled={isLoading}>
@@ -103,16 +201,16 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
                             <Label className="text-lg mx-3">Horarios de trabajo</Label>
                             <div className="flex justify-around mt-3">
                                 <div className="w-[100px]">
-                                    <SelectTimeComponent placeholderText={"Desde"} isDisabled={isDayOff} />
+                                    <SelectTimeComponent placeholderText={"Desde"} isDisabled={isDayOff} onChange={handleStartTimeChange} />
                                 </div>
                                 <div className="w-[100px]">
-                                    <SelectTimeComponent placeholderText={"Hasta"} isDisabled={isDayOff} />
+                                    <SelectTimeComponent placeholderText={"Hasta"} isDisabled={isDayOff} onChange={handleEndTimeChange} />
                                 </div>
                             </div>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" variant="outline">
+                        <Button type="submit" variant="outline" className="m-4" onClick={() => setIsOpen(true)} disabled={isLoading}>
                             {isSaving && <Loader2 className="animate-spin" />}
                             Guardar cambios
                         </Button>
@@ -123,7 +221,6 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
     );
 });
 
-DialogComponent.displayName = 'DialogComponent';
-
+DialogComponent.displayName = "DialogComponent";
 
 export default DialogComponent;

@@ -70,15 +70,16 @@ const formSchema = z.object({
 });
 
 const AppointmentForm = () => {
+    const [date, setDate] = useState();
+    const [selectedOption, setSelectedOption] = useState<string>("");
+    const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
+
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 7);
-    const [date, setDate] = useState();
     const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
-    const [selectedOption, setSelectedOption] = useState<string>("");
-    const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -369,7 +370,7 @@ const AppointmentForm = () => {
                     control={form.control}
                     name="appointment_time"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="hidden">
                             <FormLabel>Horario</FormLabel>
                             <FormControl>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
