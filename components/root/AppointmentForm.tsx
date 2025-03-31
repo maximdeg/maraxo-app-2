@@ -17,6 +17,8 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { useQuery, useMutation } from "@tanstack/react-query";
+
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import {
@@ -31,7 +33,6 @@ import {
 } from "@/components/ui/dialog";
 // import { Label } from "@/components/ui/label";
 // import { json } from "node:stream/consumers";
-
 interface Option {
     value: string;
     label: string;
@@ -71,6 +72,7 @@ const formSchema = z.object({
 
 const AppointmentForm = () => {
     const [date, setDate] = useState();
+    const [userSelectedDate, setUserSelectedDate] = useState<Date>();
     const [selectedOption, setSelectedOption] = useState<string>("");
     const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
 
@@ -124,11 +126,15 @@ const AppointmentForm = () => {
                 )}
             />
         ),
-        Practica: <div>Hidden component for Option 2</div>,
+        4: <div>Hidden component for Option 2</div>,
     };
 
     const handleSelectChange = (value: string) => {
         setSelectedOption(value);
+    };
+
+    const handleDateChange = (value: Date) => {
+        setUserSelectedDate(() => value);
     };
 
     const clearForm = () => {
@@ -213,8 +219,8 @@ const AppointmentForm = () => {
             const { id } = await patientResponse.json();
 
             if (!id) throw Error("Servidor no pudo encargarse del usuario id.");
-
             console.log(values);
+
             const appointmentJSON = {
                 patient_id: id,
                 appointment_date: values.appointment_date,
@@ -352,7 +358,10 @@ const AppointmentForm = () => {
                                         <Calendar
                                             mode="single"
                                             selected={field.value}
-                                            onSelect={field.onChange}
+                                            onSelect={(selectedDate) => {
+                                                handleDateChange(selectedDate as Date);
+                                                return field.onChange(selectedDate);
+                                            }}
                                             disabled={(date) => date < new Date() || date > limitDay}
                                             initialFocus
                                         />

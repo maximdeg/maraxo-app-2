@@ -1,25 +1,17 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const slotId = (await params).id;
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ date: string }> }) {
+    const date = (await params).date;
 
     try {
-        const availableSlots = await query(
+        const workday_date = await query(
             `
-            SELECT
-                asl.*,
-                ws.day_of_week
-            FROM available_slots asl
-            JOIN work_schedule ws ON asl.work_schedule_id = ws.id
-            WHERE asl.id = $1
-        `,
-            [slotId]
+                SELECT * FROM available_slots WHERE workday_date = $1
+            `,
+            [date]
         );
-        if (availableSlots.rows.length === 0) {
-            return NextResponse.json({ error: "Available slot not found" }, { status: 404 });
-        }
-        return NextResponse.json(availableSlots.rows[0], { status: 200 });
+        return NextResponse.json(workday_date.rows[0], { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch available slot" }, { status: 500 });

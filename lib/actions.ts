@@ -101,3 +101,41 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
         console.error(error);
     }
 };
+
+export const getAvailableTimesByDate = async (date: string) => {
+    try {
+        const unavailableTimesResponse = await fetch(`http://localhost:3000/api/unavailable-times/${date}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!unavailableTimesResponse.ok) {
+            throw new Error("Error fetching unavailable times");
+        }
+
+        const data = await unavailableTimesResponse.json();
+
+        if (data.length > 0) {
+            return data;
+        }
+
+        const availableTimesResponse = await fetch(`http://localhost:3000/api/available-times/${date}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!availableTimesResponse.ok) {
+            throw new Error("Error fetching unavailable times");
+        }
+
+        const availableTimesData = await availableTimesResponse.json();
+
+        return availableTimesData;
+    } catch (error) {
+        console.error(error);
+    }
+};

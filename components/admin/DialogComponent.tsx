@@ -56,7 +56,11 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
         },
         onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
-                description: `La fecha ${selectedDate} fue editada correctamente.`,
+                description: `La fecha ${selectedDate.toLocaleDateString("es-AR", {
+                    year: "2-digit",
+                    month: "2-digit",
+                    day: "2-digit",
+                })} fue editada correctamente.`,
                 action: {
                     label: "OK",
                     onClick: () => console.log("OK"),
@@ -121,28 +125,17 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
             //     // toast.warning("No se ha editado el dia.");
             // }
 
-            if (!isDayOff && (startTime === "" || endTime === "")) {
+            if (startTime !== "" || endTime !== "") {
+                console.log("Entro a guardar horarios");
                 const responseTime = await addUnavailableTimeMutation({ selectedDate, start_time: startTime, end_time: endTime });
             }
-            //     // toast.success("Se guardo tus horarios exitosamente.", {
-            //     //     description: `La fecha ${selectedDate.toLocaleDateString("es-AR", {
-            //     //         year: "2-digit",
-            //     //         month: "2-digit",
-            //     //         day: "2-digit",
-            //     //     })} se trabajara de ${startTime} a ${endTime}.`,
-            //     //     action: {
-            //     //         label: "OK",
-            //     //         onClick: () => console.log("OK"),
-            //     //     },
-            //     //     duration: 10000,
-            //     // });
-            // } else {
-            //     toast.warning("No se ha editado el dia.");
-            // }
         } catch (error: any) {
-            console.log(error);
             toast.error("Ocurrió un error", {
                 description: error.message,
+                action: {
+                    label: "OK",
+                    onClick: () => console.log(error.message),
+                },
             });
             setIsSaving(false);
         } finally {
