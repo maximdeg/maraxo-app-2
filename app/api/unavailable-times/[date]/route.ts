@@ -11,6 +11,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         `,
             [date]
         );
+
+        if (workday_date.rows.length === 0) {
+            return NextResponse.json({ error: "Unavailable day not found" }, { status: 404 });
+        }
+
         return NextResponse.json(workday_date.rows[0], { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);

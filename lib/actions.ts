@@ -104,22 +104,24 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
 
 export const getAvailableTimesByDate = async (date: string) => {
     try {
-        const unavailableTimesResponse = await fetch(`http://localhost:3000/api/unavailable-times/${date}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        // const unavailableTimesResponse = await fetch(`http://localhost:3000/api/unavailable-times/${date}`, {
+        //     method: "GET",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        // });
 
-        if (!unavailableTimesResponse.ok) {
-            throw new Error("Error fetching unavailable times");
-        }
+        // if (!unavailableTimesResponse.ok) {
+        //     console.log("Error fetching unavailable times");
+        // }
 
-        const data = await unavailableTimesResponse.json();
+        // const data = await unavailableTimesResponse.json();
 
-        if (data.length > 0) {
-            return data;
-        }
+        // if (data.length > 0) {
+        //     return data;
+        // }
+
+        console.log("🟢 " + date);
 
         const availableTimesResponse = await fetch(`http://localhost:3000/api/available-times/${date}`, {
             method: "GET",
@@ -129,7 +131,7 @@ export const getAvailableTimesByDate = async (date: string) => {
         });
 
         if (!availableTimesResponse.ok) {
-            throw new Error("Error fetching unavailable times");
+            throw new Error("Error fetching available times");
         }
 
         const availableTimesData = await availableTimesResponse.json();

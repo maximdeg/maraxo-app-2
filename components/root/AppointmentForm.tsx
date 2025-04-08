@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -31,6 +31,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import AvailableTimesComponent from "./AvailableTimesComponent";
 // import { Label } from "@/components/ui/label";
 // import { json } from "node:stream/consumers";
 interface Option {
@@ -42,15 +43,15 @@ interface OptionComponentMap {
     [key: string]: JSX.Element;
 }
 
-interface SubmitedJson {
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    visit_type: string;
-    date: string;
-    consult_type: string;
-    appointment_time: string;
-}
+// interface SubmitedJson {
+//     first_name: string;
+//     last_name: string;
+//     phone_number: string;
+//     visit_type: string;
+//     date: string;
+//     consult_type: string;
+//     appointment_time: string;
+// }
 
 const formSchema = z.object({
     first_name: z.string().min(2, {
@@ -81,7 +82,9 @@ const AppointmentForm = () => {
     tomorrow.setDate(today.getDate() + 1);
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 7);
-    const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+    const availableTimesComponent = useMemo(() => {
+        return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
+    }, [userSelectedDate]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -134,6 +137,7 @@ const AppointmentForm = () => {
     };
 
     const handleDateChange = (value: Date) => {
+        console.log(value);
         setUserSelectedDate(() => value);
     };
 
@@ -379,7 +383,7 @@ const AppointmentForm = () => {
                     control={form.control}
                     name="appointment_time"
                     render={({ field }) => (
-                        <FormItem className="hidden">
+                        <FormItem className={userSelectedDate ? "" : "hidden"}>
                             <FormLabel>Horario</FormLabel>
                             <FormControl>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -389,11 +393,9 @@ const AppointmentForm = () => {
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectLabel>Horarios disponibles</SelectLabel>
-                                            {times.map((time) => (
-                                                <SelectItem key={time} value={time}>
-                                                    {time}
-                                                </SelectItem>
-                                            ))}
+
+                                            {AvailableTimesComponent}
+                                            {/* <AvailableTimesComponent selectedDate={userSelectedDate as Date} /> */}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>

@@ -113,17 +113,6 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
             if (isDayOff !== firstDayOffState) {
                 const responseDay = await addUnavailableDayMutation({ selectedDate, isDayOff });
             }
-            // toast.success("Se guardo tu dia exitosamente.", {
-            //     description: `La fecha ${selectedDate} fue editada correctamente.`,
-            //     action: {
-            //         label: "OK",
-            //         onClick: () => console.log("OK"),
-            //     },
-            //     duration: 10000,
-            // });
-            // } else {
-            //     // toast.warning("No se ha editado el dia.");
-            // }
 
             if (startTime !== "" || endTime !== "") {
                 console.log("Entro a guardar horarios");

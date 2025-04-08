@@ -4,14 +4,17 @@ import { query } from "@/lib/db";
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ date: string }> }) {
     const date = (await params).date;
 
+    const realDate: Date = new Date(`${date}T12:00:00.000Z`);
+    const dateId: number = realDate.getDay();
+
     try {
         const workday_date = await query(
             `
-                SELECT * FROM available_slots WHERE workday_date = $1
+                SELECT * FROM available_slots WHERE work_schedule_id = $1
             `,
-            [date]
+            [dateId]
         );
-        return NextResponse.json(workday_date.rows[0], { status: 200 });
+        return NextResponse.json(workday_date.rows, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch available slot" }, { status: 500 });
