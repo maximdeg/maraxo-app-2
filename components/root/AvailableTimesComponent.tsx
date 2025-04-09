@@ -1,13 +1,20 @@
-import React from "react";
-import { SelectItem } from "@/components/ui/select";
+import React, { useEffect } from "react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 import { useQuery } from "@tanstack/react-query";
 import { getAvailableTimesByDate } from "@/lib/actions";
 
-const AvailableTimesComponent = ({ selectedDate }: { selectedDate: Date }) => {
+const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; form: any }) => {
     const [times, setTimes] = React.useState<string[]>([]);
-    const [receivedData, setReceivedData] = React.useState();
+    const [receivedData, setReceivedData] = React.useState<{ start_time: string; end_time: string } | null>();
 
     const createTimes = (startTime: string, endTime: string) => {
+        setTimes([]);
+        // console.log("🔴" + startTime, endTime);
+
+        if (!startTime || !endTime) return {};
+
         const startHour = parseInt(startTime.split(":")[0]);
         const startMinutes = parseInt(startTime.split(":")[1]);
         const endHour = parseInt(endTime.split(":")[0]);
@@ -16,10 +23,11 @@ const AvailableTimesComponent = ({ selectedDate }: { selectedDate: Date }) => {
         const totalMinutes = (endHour - startHour) * 60 + (endMinutes - startMinutes);
         const intervalMinutes = 20; // Intervalo de 20 minutos
 
-        for (let i = 0; i <= totalMinutes; i += intervalMinutes) {
+        for (let i = 0; i <= totalMinutes - intervalMinutes; i += intervalMinutes) {
             const hour = startHour + Math.floor(i / 60);
             const minutes = (i % 60).toString().padStart(2, "0");
             const time = `${hour}:${minutes}`;
+            // console.log("🔴" + time);
             setTimes((prevTimes) => [...prevTimes, time]);
         }
     };
@@ -40,20 +48,54 @@ const AvailableTimesComponent = ({ selectedDate }: { selectedDate: Date }) => {
             console.log(formatedDate);
 
             const data = await getAvailableTimesByDate(formatedDate);
+
+            if (!data?.start_time || !data?.end_time) return [];
             setReceivedData(data);
-            createTimes(data?.start_time, data?.end_time);
-            return data ? data : [];
+            // createTimes(data?.start_time, data?.end_time);
+            return data;
         },
     });
 
+    useEffect(() => {
+        if (receivedData) {
+            createTimes(receivedData?.start_time, receivedData?.end_time);
+        }
+    }, [receivedData]);
+
+    useEffect(() => {
+        setTimes([]);
+    }, [selectedDate]);
+
     return (
-        <>
-            {times.map((time) => (
-                <SelectItem key={time} value={time}>
-                    {time}
-                </SelectItem>
-            ))}
-        </>
+        <FormField
+            control={form.control}
+            name="appointment_time"
+            render={({ field }) => (
+                <FormItem className={selectedDate ? "" : "hidden"}>
+                    <FormLabel>Horario</FormLabel>
+                    <FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Seleccione su horario" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Horarios disponibles</SelectLabel>
+                                    {!isLoading &&
+                                        times.map((time) => (
+                                            <SelectItem key={time} value={time}>
+                                                {time}
+                                            </SelectItem>
+                                        ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </FormControl>
+
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
     );
 };
 

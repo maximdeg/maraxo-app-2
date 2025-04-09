@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -82,9 +82,14 @@ const AppointmentForm = () => {
     tomorrow.setDate(today.getDate() + 1);
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 7);
-    const availableTimesComponent = useMemo(() => {
-        return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
-    }, [userSelectedDate]);
+
+    // const selectTimesComponent = useCallback(() => {
+    //     return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
+    // }, [userSelectedDate]);
+
+    // const selectTimesComponent = useMemo(() => {
+    //     return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
+    // }, [userSelectedDate?.getTime()]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -98,6 +103,10 @@ const AppointmentForm = () => {
             appointment_time: "",
         },
     });
+
+    const selectTimesComponent = useMemo(() => {
+        return <AvailableTimesComponent selectedDate={userSelectedDate as Date} form={form} />;
+    }, [userSelectedDate]);
 
     const OptionComponents: OptionComponentMap = {
         1: (
@@ -328,7 +337,7 @@ const AppointmentForm = () => {
                                             {/* <SelectLabel>Visita</SelectLabel> */}
                                             <SelectItem value="1">Consulta</SelectItem>
                                             <SelectItem value="2">Practica</SelectItem>
-                                            <SelectItem value="3">Peeling</SelectItem>
+                                            {/* <SelectItem value="3">Peeling</SelectItem> */}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -379,34 +388,7 @@ const AppointmentForm = () => {
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="appointment_time"
-                    render={({ field }) => (
-                        <FormItem className={userSelectedDate ? "" : "hidden"}>
-                            <FormLabel>Horario</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Seleccione su horario" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Horarios disponibles</SelectLabel>
-
-                                            {AvailableTimesComponent}
-                                            {/* <AvailableTimesComponent selectedDate={userSelectedDate as Date} /> */}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                {selectTimesComponent}
                 <div className="flex justify-end py-6 ">
                     <Dialog>
                         <DialogTrigger asChild>

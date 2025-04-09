@@ -25,3 +25,13 @@ CREATE TABLE unavailable_time_frames (
 
 -- Indexes for better performance
 CREATE INDEX idx_workday_date ON unavailable_time_frames (workday_date);
+
+ALTER TABLE unavailable_time_frames
+ADD COLUMN work_schedule_id INTEGER;
+
+ALTER TABLE unavailable_time_frames
+ADD CONSTRAINT fk_work_schedule_id
+FOREIGN KEY (work_schedule_id)
+REFERENCES work_schedule(id)
+ON DELETE CASCADE;
+

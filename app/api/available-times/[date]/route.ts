@@ -5,16 +5,50 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const date = (await params).date;
 
     const realDate: Date = new Date(`${date}T12:00:00.000Z`);
-    const dateId: number = realDate.getDay();
+    const weekDay: number = realDate.getDay() + 1;
 
     try {
         const workday_date = await query(
-            `
-                SELECT * FROM available_slots WHERE work_schedule_id = $1
-            `,
-            [dateId]
+            `SELECT 
+                ws.is_working_day, 
+                utf.start_time,
+                utf.end_time,
+                ud.is_confirmed
+            FROM unavailable_time_frames utf
+            JOIN work_schedule ws ON utf.work_schedule_id = ws.id
+            LEFT JOIN unavailable_days ud ON utf.workday_date = ud.unavailable_date
+            WHERE utf.workday_date = $1`,
+            [date]
         );
-        return NextResponse.json(workday_date.rows, { status: 200 });
+
+        if (workday_date.rows.length > 0) {
+            if (workday_date.rows[0].is_working_day === false || workday_date.rows[0].is_confirmed === true) {
+                return NextResponse.json({ error: "This day is unavailable" }, { status: 404 });
+            } else {
+                return NextResponse.json(workday_date.rows, { status: 200 });
+            }
+        }
+
+        const availableSlots = await query(
+            `SELECT 
+                available_slots.start_time,
+                available_slots.end_time,
+                ws.is_working_day
+            FROM available_slots 
+            JOIN work_schedule ws ON available_slots.work_schedule_id = ws.id
+            WHERE work_schedule_id = $1`,
+            [weekDay]
+        );
+
+        if (availableSlots.rows.length === 0) {
+            return NextResponse.json({ error: "Available slot not found" }, { status: 404 });
+        }
+
+        if (!availableSlots.rows[0].is_working_day) {
+            return NextResponse.json({ error: "This day is not working day" }, { status: 404 });
+        }
+
+        return NextResponse.json(availableSlots.rows[0], { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch available slot" }, { status: 500 });

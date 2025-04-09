@@ -24,10 +24,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        const work_schedule_id = new Date(workday_date).getDay() + 1;
+
         const result = await query(
-            `INSERT INTO unavailable_time_frames (workday_date, start_time, end_time)
-            VALUES ($1, $2, $3) RETURNING id`,
-            [workday_date, start_time, end_time]
+            `INSERT INTO unavailable_time_frames (workday_date, start_time, end_time, work_schedule_id)
+            VALUES ($1, $2, $3, $4) RETURNING id`,
+            [workday_date, start_time, end_time, work_schedule_id]
         );
         return NextResponse.json({ message: "Available slot created successfully", id: result.rows[0].id }, { status: 201 });
     } catch (error) {
