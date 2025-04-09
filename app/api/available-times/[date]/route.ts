@@ -5,7 +5,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const date = (await params).date;
 
     const realDate: Date = new Date(`${date}T12:00:00.000Z`);
-    const weekDay: number = realDate.getDay() + 1;
+    const weekDay: number = realDate.getDay();
+
+    console.log("WEEKDAY ", date, weekDay);
 
     try {
         const workday_date = await query(
@@ -40,7 +42,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
             [weekDay]
         );
 
-        if (availableSlots.rows.length === 0) {
+        if (availableSlots.rows.length < 1) {
             return NextResponse.json({ error: "Available slot not found" }, { status: 404 });
         }
 
@@ -48,7 +50,18 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
             return NextResponse.json({ error: "This day is not working day" }, { status: 404 });
         }
 
-        return NextResponse.json(availableSlots.rows[0], { status: 200 });
+        const appointmentTimesByDate = await query(
+            `SELECT 
+                a.appointment_date,
+                a.appointment_time
+            FROM appointments a
+            WHERE a.appointment_date = $1`,
+            [date]
+        );
+
+        const appointmentTimes = appointmentTimesByDate.rows.map((item: any) => item.appointment_time);
+
+        return NextResponse.json({ availableSlots: availableSlots.rows[0], appointmentTimes }, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch available slot" }, { status: 500 });

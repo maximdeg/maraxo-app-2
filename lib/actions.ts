@@ -135,9 +135,9 @@ export const getAvailableTimesByDate = async (date: string) => {
         }
 
         const availableTimesData = await availableTimesResponse.json();
-        console.log(availableTimesData[0]);
+        console.dir(availableTimesData);
 
-        return availableTimesData[0];
+        return availableTimesData;
     } catch (error) {
         console.error(error);
     }

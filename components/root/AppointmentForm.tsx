@@ -71,6 +71,33 @@ const formSchema = z.object({
     appointment_time: z.string().nonempty("Por favor seleccione un horario."),
 });
 
+const holidays = [
+    new Date("2025-01-01"), // New Year's Day
+    new Date("2025-04-21"), // Good Friday
+    new Date("2025-12-25"), // Christmas Day
+];
+
+const areDatesEqual = (date1: Date, date2: Date) => {
+    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+};
+
+const disabledDays = (day: Date) => {
+    const dayOfWeek = day.getDay();
+    const today = new Date();
+    const limitDay = new Date(today);
+    limitDay.setDate(today.getDate() + 30);
+
+    return (
+        dayOfWeek === 0 ||
+        dayOfWeek === 4 ||
+        dayOfWeek === 5 ||
+        dayOfWeek === 6 ||
+        day < new Date() ||
+        day > limitDay ||
+        holidays.some((holiday) => areDatesEqual(holiday, day))
+    );
+};
+
 const AppointmentForm = () => {
     const [date, setDate] = useState();
     const [userSelectedDate, setUserSelectedDate] = useState<Date>();
@@ -81,7 +108,7 @@ const AppointmentForm = () => {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const limitDay = new Date(tomorrow);
-    limitDay.setDate(tomorrow.getDate() + 7);
+    limitDay.setDate(tomorrow.getDate() + 30);
 
     // const selectTimesComponent = useCallback(() => {
     //     return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
@@ -375,7 +402,7 @@ const AppointmentForm = () => {
                                                 handleDateChange(selectedDate as Date);
                                                 return field.onChange(selectedDate);
                                             }}
-                                            disabled={(date) => date < new Date() || date > limitDay}
+                                            disabled={disabledDays}
                                             initialFocus
                                         />
                                     </PopoverContent>

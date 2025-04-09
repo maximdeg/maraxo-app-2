@@ -7,11 +7,13 @@ import { getAvailableTimesByDate } from "@/lib/actions";
 
 const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; form: any }) => {
     const [times, setTimes] = React.useState<string[]>([]);
-    const [receivedData, setReceivedData] = React.useState<{ start_time: string; end_time: string } | null>();
+    const [receivedData, setReceivedData] = React.useState<{
+        availableSlots: { start_time: string; end_time: string; is_working_day: boolean };
+        appointmentTimes: string[];
+    } | null>();
 
-    const createTimes = (startTime: string, endTime: string) => {
+    const createTimes = (startTime: string, endTime: string, appointmentTimes: string[]) => {
         setTimes([]);
-        // console.log("🔴" + startTime, endTime);
 
         if (!startTime || !endTime) return {};
 
@@ -27,8 +29,9 @@ const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; f
             const hour = startHour + Math.floor(i / 60);
             const minutes = (i % 60).toString().padStart(2, "0");
             const time = `${hour}:${minutes}`;
-            // console.log("🔴" + time);
-            setTimes((prevTimes) => [...prevTimes, time]);
+            if (!appointmentTimes.includes(time)) {
+                setTimes((prevTimes) => [...prevTimes, time]);
+            }
         }
     };
 
@@ -45,20 +48,19 @@ const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; f
                 .map((item) => (item.length < 2 ? `0${item}` : item))
                 .join("-");
 
-            console.log(formatedDate);
+            console.log("🟠 " + formatedDate);
 
             const data = await getAvailableTimesByDate(formatedDate);
 
-            if (!data?.start_time || !data?.end_time) return [];
+            if (!data.availableSlots?.start_time || !data.availableSlots?.end_time) return [];
             setReceivedData(data);
-            // createTimes(data?.start_time, data?.end_time);
             return data;
         },
     });
 
     useEffect(() => {
         if (receivedData) {
-            createTimes(receivedData?.start_time, receivedData?.end_time);
+            createTimes(receivedData.availableSlots?.start_time, receivedData.availableSlots?.end_time, receivedData?.appointmentTimes);
         }
     }, [receivedData]);
 
@@ -81,12 +83,17 @@ const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; f
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Horarios disponibles</SelectLabel>
-                                    {!isLoading &&
+                                    {!isLoading ? (
                                         times.map((time) => (
                                             <SelectItem key={time} value={time}>
                                                 {time}
                                             </SelectItem>
-                                        ))}
+                                        ))
+                                    ) : !isError ? (
+                                        <SelectItem value="Cargando...">Cargando...</SelectItem>
+                                    ) : (
+                                        <SelectItem value="No hay horarios disponibles">No hay horarios disponibles</SelectItem>
+                                    )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
