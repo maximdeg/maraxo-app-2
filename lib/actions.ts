@@ -2,7 +2,7 @@
 
 export const getAppointments = async (date: string) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/appointments/date/${date}`, {
+        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/date/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const getAppointments = async (date: string) => {
 
 export const getUnavailableDay = async (date: string) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/unavailable-days/${date}`, {
+        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-days/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export const getUnavailableDay = async (date: string) => {
 
 export const addUnavailableDay = async (unavailable_date: Date, is_confirmed: boolean): Promise<any> => {
     try {
-        const response = await fetch(`http://localhost:3000/api/unavailable-days`, {
+        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-days`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const addUnavailableDay = async (unavailable_date: Date, is_confirmed: bo
 
 export const addUnavailableTime = async (workday_date: Date, start_time: string, end_time: string): Promise<any> => {
     try {
-        const response = await fetch(`http://localhost:3000/api/unavailable-times`, {
+        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-times`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
 
 export const getAvailableTimesByDate = async (date: string) => {
     try {
-        // const unavailableTimesResponse = await fetch(`http://localhost:3000/api/unavailable-times/${date}`, {
+        // const unavailableTimesResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-times/${date}`, {
         //     method: "GET",
         //     headers: {
         //         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export const getAvailableTimesByDate = async (date: string) => {
 
         console.log("🟢 " + date);
 
-        const availableTimesResponse = await fetch(`http://localhost:3000/api/available-times/${date}`, {
+        const availableTimesResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/available-times/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
