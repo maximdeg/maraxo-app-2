@@ -4,6 +4,9 @@ const nextConfig = {
     experimental: {
         typedRoutes: true,
     },
+    env: {
+        BACKEND_API_PROD: process.env.BACKEND_API_PROD,
+    },
 };
 
 module.exports = nextConfig;
