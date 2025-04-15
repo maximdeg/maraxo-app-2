@@ -141,3 +141,24 @@ export const getAvailableTimesByDate = async (date: string) => {
         console.error(error);
     }
 };
+
+export const cancelAppointment = async (id: string) => {
+    try {
+        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Error cancelling appointment");
+        }
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};

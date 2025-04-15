@@ -21,7 +21,7 @@ const AccordionItemList = memo(({ date, appointments }: { date: Date; appointmen
                         </h2>
                     </div>
                     {appointments.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="space-y-2 ">
                             {appointments.map((appointment: AppointmentInfo) => (
                                 <AppointmentCard key={appointment.id} appointment={appointment} />
                             ))}
