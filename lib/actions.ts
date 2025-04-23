@@ -91,11 +91,55 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
             throw new Error("Error adding unavailable day");
         }
 
-        console.log("ADDING DAY?");
-
         const data = await response.json();
 
         return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const addNewPatientAndAppointment = async (first_name: string, last_name: string, phone_number: string) => {
+    try {
+        const patientResponse = await fetch("/api/patients", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                first_name,
+                last_name,
+                phone_number,
+            }),
+        });
+
+        if (patientResponse.ok) {
+            console.log("🟢 Patient booked successfully!", patientResponse);
+        } else {
+            const errorData = await patientResponse.json();
+            console.log(`🔴 Patient registration failed: ${errorData.error || "Unknown error"}`);
+        }
+
+        const { id } = await patientResponse.json();
+
+        if (!id) throw Error("Servidor no pudo encargarse del usuario id.");
+
+        const appointmentJSON = {
+            patient_id: id,
+            // appointment_date: values.appointment_date,
+            // appointment_time: values.appointment_time,
+            // consult_type_id: +values.consult_type,
+            // visit_type_id: +values.visit_type,
+            notes: null,
+        };
+
+        const response = await fetch("/api/appointments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(appointmentJSON),
+        });
     } catch (error) {
         console.error(error);
     }

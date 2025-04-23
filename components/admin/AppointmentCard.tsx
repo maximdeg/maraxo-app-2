@@ -44,17 +44,15 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log(appointment.id);
-
         cancelAppointmentMutation({ appointment });
     };
 
     return (
         <div
             key={appointment.id}
-            className=" p-4 border rounded-lg shadow-sm flex flex-col ease-in-out group duration-200"
+            className="p-4 border rounded-lg shadow-sm flex flex-col transition-all ease-in-out duration-1000 "
             tabIndex={0}
-            onClick={() => setShowButton(true)}
+            onClick={() => setShowButton(!showButton)}
         >
             <div className="flex justify-between items-center">
                 <div>
@@ -75,9 +73,14 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                 </span>
             </div>
             {showButton && (
-                <div className="mt-2 pt-2 self-center">
-                    <Button className="w-full" variant="destructive" aria-label="Cancelar visita" onClick={(e) => handleCancelAppointment(e)}>
-                        Cancelar visita
+                <div className={`mt-2 pt-2 self-center transition-all ease-in-out duration-1000`}>
+                    <Button
+                        className="w-full"
+                        variant={appointment.status === "scheduled" ? "destructive" : "outline"}
+                        aria-label="Cancelar visita"
+                        onClick={(e) => appointment.status === "scheduled" && handleCancelAppointment(e)}
+                    >
+                        {appointment.status === "scheduled" ? "Cancelar cita" : "Reagendar cita"}
                     </Button>
                 </div>
             )}

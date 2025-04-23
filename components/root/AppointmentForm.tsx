@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import React, { useState, useMemo, useCallback } from "react";
+import { toast } from "sonner";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -17,6 +18,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { addNewPatientAndAppointment } from "@/lib/actions";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -234,6 +236,38 @@ const AppointmentForm = () => {
 
         setConfirmationInfo(AppointmentInfoComponent);
     };
+
+    const { mutateAsync: addNewPatientMutation } = useMutation({
+        mutationFn: async (variables: z.infer<typeof formSchema>) => {
+            return addNewPatientAndAppointment(variables.first_name, variables.last_name, variables.phone_number);
+        },
+        onMutate: () => {
+            // Handle Mutation?
+        },
+        onSettled: () => {
+            toast.loading("Cancelando visita...", {
+                description: "La visita se esta cancelando...",
+                action: {
+                    label: "OK",
+                    onClick: () => console.log("OK"),
+                },
+                duration: 5000,
+            });
+        },
+        onSuccess: () => {
+            toast.success("Se guardo tu dia exitosamente.", {
+                description: `La visita se cancelo exitosamente`,
+                action: {
+                    label: "OK",
+                    onClick: () => console.log("OK"),
+                },
+                duration: 10000,
+            });
+        },
+        onError: () => {
+            toast.warning("No se ha cancelado correctamente.");
+        },
+    });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
