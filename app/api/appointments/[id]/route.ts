@@ -57,18 +57,22 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const appointmentId = (await params).id;
-    if (!appointmentId) {
-        return NextResponse.json({ error: "Missing appointment ID for deletion" }, { status: 400 });
-    }
     try {
-        const result = await query("DELETE FROM appointments WHERE id = $1", [appointmentId]);
-        if (result.rowCount === 0) {
-            return NextResponse.json({ error: "Appointment not found for deletion" }, { status: 404 });
+        const appointmentId = (await params).id;
+
+        if (!appointmentId) {
+            return NextResponse.json({ error: "Missing appointment ID" }, { status: 400 });
         }
-        return NextResponse.json({ message: "Appointment deleted successfully" }, { status: 200 });
+
+        const result = await query(`UPDATE appointments SET status = 'cancelled', updated_at = NOW() WHERE id = $1`, [appointmentId]);
+
+        if (result.rowCount === 0) {
+            return NextResponse.json({ error: "Appointment not found for update" }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: "Appointment cancelled successfully", id: result.rows[0].id }, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
-        return NextResponse.json({ error: "Failed to delete appointment" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to cancel appointment" }, { status: 500 });
     }
 }

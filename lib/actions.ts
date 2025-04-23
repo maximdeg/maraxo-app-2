@@ -145,7 +145,7 @@ export const getAvailableTimesByDate = async (date: string) => {
 export const cancelAppointment = async (id: string) => {
     try {
         const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/${id}`, {
-            method: "PUT",
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -156,7 +156,7 @@ export const cancelAppointment = async (id: string) => {
         }
 
         const data = await response.json();
-
+        console.log(data);
         return data;
     } catch (error) {
         console.error(error);

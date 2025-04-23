@@ -16,7 +16,7 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
             // Handle Mutation?
         },
         onSettled: () => {
-            toast.success("Se guardo tu dia exitosamente.", {
+            toast.loading("Cancelando visita...", {
                 description: "La visita se esta cancelando...",
                 action: {
                     label: "OK",
@@ -43,6 +43,8 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
     const handleCancelAppointment = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
+
+        console.log(appointment.id);
 
         cancelAppointmentMutation({ appointment });
     };
