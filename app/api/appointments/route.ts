@@ -52,6 +52,10 @@ export async function POST(req: NextRequest) {
             [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes]
         );
 
+        if (result.rowCount === 0) {
+            return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
+        }
+
         return NextResponse.json({ message: "Appointment created successfully", appointment_info: result.rows[0] }, { status: 201 });
     } catch (error: any) {
         console.error("Database query error:", error);
