@@ -103,7 +103,7 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
 
 export const addNewPatientAndAppointment = async ({ appointment }: { appointment: NewAppointmentInfo }) => {
     try {
-        const patientResponse = await fetch("/api/patients", {
+        const patientResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/patients`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             notes: null,
         };
 
-        const appointmentResponse = await fetch("/api/appointments", {
+        const appointmentResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/patients`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
