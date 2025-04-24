@@ -248,7 +248,7 @@ const AppointmentForm = () => {
         onSettled: () => {
             toast.loading("Agendando visita", {
                 description: "La visita se esta agendando",
-                duration: 5000,
+                duration: 4000,
             });
         },
         onSuccess: () => {

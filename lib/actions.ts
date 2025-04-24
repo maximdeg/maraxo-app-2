@@ -103,6 +103,10 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
 
 export const addNewPatientAndAppointment = async ({ appointment }: { appointment: NewAppointmentInfo }) => {
     try {
+        if (!appointment.first_name || !appointment.last_name || !appointment.phone_number) {
+            throw new Error("Missing required patient information");
+        }
+
         const patientResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/patients`, {
             method: "POST",
             headers: {
@@ -135,7 +139,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             notes: null,
         };
 
-        const appointmentResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/patients`, {
+        const appointmentResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -147,7 +151,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             console.log("🟢 Appointment booked successfully!", appointmentResponse);
         } else {
             const errorData = await appointmentResponse.json();
-            console.log(`🔴 Appointment registration failed: ${errorData.error || "Unknown error"}`);
+            return console.log(`🔴 Appointment registration failed: ${errorData.error || "Unknown error"}`);
         }
 
         const appointment_info = await appointmentResponse.json();
