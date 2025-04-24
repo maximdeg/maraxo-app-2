@@ -36,11 +36,23 @@ export async function POST(req: NextRequest) {
 
         const result = await query(
             `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING 
+                a.id,
+                p.name AS patient_name,
+                a.appointment_date,
+                a.appointment_time,
+                ct.name AS consult_type_name,
+                vt.name AS visit_type_name,
+                a.notes
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN consult_types ct ON a.consult_type_id = ct.id
+            JOIN visit_types vt ON a.visit_type_id = vt.id;`,
             [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes]
         );
 
-        return NextResponse.json({ message: "Appointment created successfully", id: result.rows[0].id }, { status: 201 });
+        return NextResponse.json({ message: "Appointment created successfully", appointment_info: result.rows[0] }, { status: 201 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });

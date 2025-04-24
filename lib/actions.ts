@@ -1,5 +1,7 @@
 "use server";
 
+import { NewAppointmentInfo } from "./types";
+
 export const getAppointments = async (date: string) => {
     try {
         const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/date/${date}`, {
@@ -99,7 +101,7 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
     }
 };
 
-export const addNewPatientAndAppointment = async (first_name: string, last_name: string, phone_number: string) => {
+export const addNewPatientAndAppointment = async ({ appointment }: { appointment: NewAppointmentInfo }) => {
     try {
         const patientResponse = await fetch("/api/patients", {
             method: "POST",
@@ -107,9 +109,9 @@ export const addNewPatientAndAppointment = async (first_name: string, last_name:
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                first_name,
-                last_name,
-                phone_number,
+                first_name: appointment.first_name,
+                last_name: appointment.last_name,
+                phone_number: appointment.phone_number,
             }),
         });
 
@@ -126,20 +128,31 @@ export const addNewPatientAndAppointment = async (first_name: string, last_name:
 
         const appointmentJSON = {
             patient_id: id,
-            // appointment_date: values.appointment_date,
-            // appointment_time: values.appointment_time,
-            // consult_type_id: +values.consult_type,
-            // visit_type_id: +values.visit_type,
+            appointment_date: appointment.appointment_date,
+            appointment_time: appointment.appointment_time,
+            consult_type_id: appointment.consult_type_id,
+            visit_type_id: appointment.visit_type_id,
             notes: null,
         };
 
-        const response = await fetch("/api/appointments", {
+        const appointmentResponse = await fetch("/api/appointments", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(appointmentJSON),
         });
+
+        if (appointmentResponse.ok) {
+            console.log("🟢 Appointment booked successfully!", appointmentResponse);
+        } else {
+            const errorData = await appointmentResponse.json();
+            console.log(`🔴 Appointment registration failed: ${errorData.error || "Unknown error"}`);
+        }
+
+        const appointment_info = await appointmentResponse.json();
+
+        return appointment_info;
     } catch (error) {
         console.error(error);
     }

@@ -11,3 +11,13 @@ export interface UnavailableDay {
     unavailable_date: Date;
     is_confirmed: boolean;
 }
+
+export interface NewAppointmentInfo {
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    visit_type_id: number;
+    consult_type_id: number;
+    appointment_date: Date;
+    appointment_time: string;
+}

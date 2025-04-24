@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import React, { useState, useMemo, useCallback } from "react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import React, { useState, useMemo } from "react";
 import { toast } from "sonner";
 
 import { es } from "date-fns/locale";
@@ -19,7 +19,8 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { addNewPatientAndAppointment } from "@/lib/actions";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { NewAppointmentInfo } from "@/lib/types";
+import { useMutation } from "@tanstack/react-query";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -237,89 +238,62 @@ const AppointmentForm = () => {
         setConfirmationInfo(AppointmentInfoComponent);
     };
 
-    const { mutateAsync: addNewPatientMutation } = useMutation({
-        mutationFn: async (variables: z.infer<typeof formSchema>) => {
-            return addNewPatientAndAppointment(variables.first_name, variables.last_name, variables.phone_number);
+    const { mutateAsync: addNewPatientAndAppointmentMutation } = useMutation({
+        mutationFn: async (variables: { appointment: NewAppointmentInfo }) => {
+            return addNewPatientAndAppointment(variables);
         },
         onMutate: () => {
             // Handle Mutation?
         },
         onSettled: () => {
-            toast.loading("Cancelando visita...", {
-                description: "La visita se esta cancelando...",
-                action: {
-                    label: "OK",
-                    onClick: () => console.log("OK"),
-                },
+            toast.loading("Agendando visita", {
+                description: "La visita se esta agendando",
                 duration: 5000,
             });
         },
         onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
-                description: `La visita se cancelo exitosamente`,
+                description: `La visita se agendo exitosamente`,
                 action: {
                     label: "OK",
                     onClick: () => console.log("OK"),
                 },
                 duration: 10000,
             });
+
+            clearForm();
         },
         onError: () => {
-            toast.warning("No se ha cancelado correctamente.");
+            toast.warning("No se ha agendado correctamente. Intente nuevamente mas tarde.");
         },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const patientResponse = await fetch("/api/patients", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    first_name: values.first_name,
-                    last_name: values.last_name,
-                    phone_number: values.phone_number,
-                }),
-            });
-
-            if (patientResponse.ok) {
-                console.log("🟢 Patient booked successfully!", patientResponse);
-            } else {
-                const errorData = await patientResponse.json();
-                console.log(`🔴 Patient registration failed: ${errorData.error || "Unknown error"}`);
-            }
-
-            const { id } = await patientResponse.json();
-
-            if (!id) throw Error("Servidor no pudo encargarse del usuario id.");
-            console.log(values);
-
-            const appointmentJSON = {
-                patient_id: id,
+            const newAppointmentInfo: NewAppointmentInfo = {
+                first_name: values.first_name,
+                last_name: values.last_name,
+                phone_number: values.phone_number,
+                visit_type_id: +values.visit_type,
+                consult_type_id: +values.consult_type,
                 appointment_date: values.appointment_date,
                 appointment_time: values.appointment_time,
-                consult_type_id: +values.consult_type,
-                visit_type_id: +values.visit_type,
-                notes: null,
             };
 
-            const response = await fetch("/api/appointments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(appointmentJSON),
+            const response = await addNewPatientAndAppointmentMutation({
+                appointment: newAppointmentInfo,
             });
 
-            if (response.ok) {
-                console.log("🟢 Appointment booked successfully!");
-                showModalInfo(values);
-                clearForm();
-            } else {
-                const errorData = await response.json();
-                console.log(`🔴 Booking failed: ${errorData.error || "Unknown error"}`);
-            }
+            const data = response.json();
+
+            // if (data) {
+            console.log("🟢 Appointment booked successfully!", data);
+            // showModalInfo(values);
+            //     clearForm();
+            // } else {
+            //     const errorData = await response.json();
+            //     console.log(`🔴 Booking failed: ${errorData.error || "Unknown error"}`);
+            // }
         } catch (error) {
             console.error("🟠 Fetch error:", error);
         }
