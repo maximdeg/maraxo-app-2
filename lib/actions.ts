@@ -149,14 +149,15 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
 
         console.dir(appointmentResponse.body, appointmentResponse);
 
-        const appointment_info = await appointmentResponse.json();
-
-        if (appointment_info.ok) {
+        if (appointmentResponse.ok) {
             console.log("🟢 Appointment booked successfully!", appointmentResponse);
         } else {
-            console.log(`🔴 Appointment registration failed: ${appointment_info.error || "Unknown error"}`);
-            throw new Error(appointment_info.error || "Unknown error");
+            const appointment_error = await appointmentResponse.json();
+            console.log(`🔴 Appointment registration failed: ${appointment_error.error || "Unknown error"}`);
+            throw new Error(appointment_error.error || "Unknown error");
         }
+
+        const appointment_info = await appointmentResponse.json();
 
         return appointment_info;
     } catch (error) {

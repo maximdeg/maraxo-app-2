@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
         }
 
-        return NextResponse.json({ message: "Appointment created successfully", appointment_info: result.rows[0] }, { status: 201 });
+        return NextResponse.json({ message: "Appointment created successfully", appointment_info: result.rows }, { status: 201 });
     } catch (error: any) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: `Failed to create appointment ${error.stringify()}` }, { status: 500 });
