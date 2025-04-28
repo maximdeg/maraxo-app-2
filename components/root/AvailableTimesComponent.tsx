@@ -43,6 +43,8 @@ const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; f
     } = useQuery({
         queryKey: ["availableTimes", { selectedDate }],
         queryFn: async () => {
+            if (!selectedDate) return [];
+            setTimes([]);
             const formatedDate: string = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`
                 .split("-")
                 .map((item) => (item.length < 2 ? `0${item}` : item))
@@ -83,17 +85,20 @@ const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; f
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Horarios disponibles</SelectLabel>
-                                    {!isLoading ? (
-                                        times.map((time) => (
-                                            <SelectItem key={time} value={time}>
-                                                {time}
-                                            </SelectItem>
-                                        ))
-                                    ) : !isError ? (
-                                        <SelectItem value="Cargando...">Cargando...</SelectItem>
-                                    ) : (
-                                        <SelectItem value="No hay horarios disponibles">No hay horarios disponibles</SelectItem>
-                                    )}
+                                    {
+                                        !isPending ? (
+                                            times.map((time) => (
+                                                <SelectItem key={time} value={time}>
+                                                    {time}
+                                                </SelectItem>
+                                            ))
+                                        ) : (
+                                            <SelectItem value="Cargando...">Cargando...</SelectItem>
+                                        )
+                                        //  : (
+                                        //     <SelectItem value="No hay horarios disponibles">No hay horarios disponibles</SelectItem>
+                                        // )
+                                    }
                                 </SelectGroup>
                             </SelectContent>
                         </Select>

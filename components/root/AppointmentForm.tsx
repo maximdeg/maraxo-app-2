@@ -46,16 +46,6 @@ interface OptionComponentMap {
     [key: string]: JSX.Element;
 }
 
-// interface SubmitedJson {
-//     first_name: string;
-//     last_name: string;
-//     phone_number: string;
-//     visit_type: string;
-//     date: string;
-//     consult_type: string;
-//     appointment_time: string;
-// }
-
 const formSchema = z.object({
     first_name: z.string().min(2, {
         message: "El nombre debe tener al menos 2 caracteres.",
@@ -181,37 +171,38 @@ const AppointmentForm = () => {
     };
 
     const clearForm = () => {
+        setUserSelectedDate(undefined);
+        setSelectedOption("");
+        setDate(undefined);
         form.reset();
     };
 
-    const showModalInfo = (values: z.infer<typeof formSchema>) => {
+    const showModalInfo = (values: any) => {
         const AppointmentInfoComponent: React.ReactNode = (
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="flex gap-2 items-center text-green-700 text-2xl ">
+                    <DialogTitle className="flex gap-2 items-center text-green-400 text-2xl text-center">
                         <Check className="h-8 w-8" />
                         Visita agendada con exito
                     </DialogTitle>
-                    <DialogDescription className="text-white">Asegurese que toda la informacion es correcta</DialogDescription>
+                    <DialogDescription className="text-white text-center">Asegurese que toda la informacion es correcta</DialogDescription>
                 </DialogHeader>
                 <DialogHeader>
                     <DialogTitle>
-                        <div className="items-start border-2 border-red-500">
+                        <div className="items-start text-center">
                             <span className="font-extralight">Nombre: </span>
-                            <span>
-                                {values.first_name} {values.last_name}
-                            </span>
+                            <span>{values.patient_name}</span>
                             <br />
                             <span className="font-extralight ">Telefono: </span>
                             <span>{values.phone_number}</span>
                             <br />
                             <span className="font-extralight ">Tipo de visita: </span>
-                            <span>{values.visit_type}</span>
+                            <span>{values.visit_type_name}</span>
                             <br />
-                            {values.visit_type === "consulta" && (
+                            {values.visit_type_name === "consulta" && (
                                 <>
                                     <span className="font-extralight ">Tipo de consulta: </span>
-                                    <span>{values.consult_type}</span>
+                                    <span>{values.consult_type_name}</span>
                                     <br />
                                 </>
                             )}
@@ -242,15 +233,7 @@ const AppointmentForm = () => {
         mutationFn: async (variables: { appointment: NewAppointmentInfo }) => {
             return addNewPatientAndAppointment(variables);
         },
-        onMutate: () => {
-            // Handle Mutation?
-        },
-        onSettled: () => {
-            toast.loading("Agendando visita", {
-                description: "La visita se esta agendando",
-                duration: 4000,
-            });
-        },
+        onMutate: () => {},
         onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
                 description: `La visita se agendo exitosamente`,
@@ -261,6 +244,7 @@ const AppointmentForm = () => {
                 duration: 10000,
             });
 
+            console.log("🟢 Appointment booked successfully!");
             clearForm();
         },
         onError: () => {
@@ -284,16 +268,7 @@ const AppointmentForm = () => {
                 appointment: newAppointmentInfo,
             });
 
-            const data = response.json();
-
-            // if (data) {
-            console.log("🟢 Appointment booked successfully!", data);
-            // showModalInfo(values);
-            //     clearForm();
-            // } else {
-            //     const errorData = await response.json();
-            //     console.log(`🔴 Booking failed: ${errorData.error || "Unknown error"}`);
-            // }
+            showModalInfo(response.appointment_info);
         } catch (error) {
             console.error("🟠 Fetch error:", error);
         }
@@ -411,7 +386,7 @@ const AppointmentForm = () => {
                                                 return field.onChange(selectedDate);
                                             }}
                                             disabled={disabledDays}
-                                            initialFocus
+                                            // initialFocus
                                         />
                                     </PopoverContent>
                                 </Popover>

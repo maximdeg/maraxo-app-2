@@ -13,17 +13,7 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
             return cancelAppointment(appointment.id);
         },
         onMutate: () => {
-            // Handle Mutation?
-        },
-        onSettled: () => {
-            toast.loading("Cancelando visita...", {
-                description: "La visita se esta cancelando...",
-                action: {
-                    label: "OK",
-                    onClick: () => console.log("OK"),
-                },
-                duration: 5000,
-            });
+            // mutate
         },
         onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
