@@ -34,21 +34,18 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        console.log("💻", body);
+
         const result = await query(
             `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes)
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING 
-                a.id,
-                p.name AS patient_name,
-                a.appointment_date,
-                a.appointment_time,
-                ct.name AS consult_type_name,
-                vt.name AS visit_type_name,
-                a.notes
-            FROM appointments a
-            JOIN patients p ON a.patient_id = p.id
-            JOIN consult_types ct ON a.consult_type_id = ct.id
-            JOIN visit_types vt ON a.visit_type_id = vt.id;`,
+            id,
+            appointment_date,
+            appointment_time,
+            consult_type_id,
+            visit_type_id,
+            notes;`,
             [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes]
         );
 
@@ -56,9 +53,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
         }
 
-        return NextResponse.json({ message: "Appointment created successfully", appointment_info: result.rows }, { status: 201 });
+        const newAppointmentInfo = await query(
+            `  SELECT 
+                a.id,
+                p.last_name || ', ' || p.first_name AS patient_name,
+                p.phone_number,
+                a.appointment_date,
+                a.appointment_time,
+                ct.name AS consult_type_name,
+                vt.name AS visit_type_name,
+                a.notes
+                FROM appointments a
+                JOIN patients p ON a.patient_id = p.id
+                JOIN consult_types ct ON a.consult_type_id = ct.id
+                JOIN visit_types vt ON a.visit_type_id = vt.id
+                WHERE a.id = $1;`,
+            [result.rows[0].id]
+        );
+
+        return NextResponse.json({ message: "Appointment created successfully", appointment_info: newAppointmentInfo.rows[0] }, { status: 201 });
     } catch (error: any) {
         console.error("Database query error:", error);
-        return NextResponse.json({ error: `Failed to create appointment ${error.stringify()}` }, { status: 500 });
+        return NextResponse.json({ error: `Failed to create appointment ${error.message}` }, { status: 500 });
     }
 }

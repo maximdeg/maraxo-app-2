@@ -139,7 +139,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             notes: null,
         };
 
-        const appointmentResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments`, {
+        const appointmentResponse = await fetch(`http://localhost:3000/api/appointments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -152,9 +152,9 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
         if (appointmentResponse.ok) {
             console.log("🟢 Appointment booked successfully!", appointmentResponse);
         } else {
-            const appointment_error = await appointmentResponse.json();
-            console.log(`🔴 Appointment registration failed: ${appointment_error.error || "Unknown error"}`);
-            throw new Error(appointment_error.error || "Unknown error");
+            // const appointment_error = await appointmentResponse.json();
+            return console.log(`🔴 Appointment registration failed: ${appointmentResponse.status || "Unknown error"}`);
+            // throw new Error(appointmentResponse.status || "Unknown error");
         }
 
         const appointment_info = await appointmentResponse.json();
