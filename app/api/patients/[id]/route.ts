@@ -17,9 +17,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function PUT(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const patientId = (await params).id;
-
     try {
+        const patientId = (await params).id;
         const body = await _request.json();
         const { first_name, last_name, phone_number } = body;
 
