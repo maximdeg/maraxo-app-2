@@ -4,6 +4,17 @@ import { Button } from "../ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { cancelAppointment } from "@/lib/actions";
 import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
 
 const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
     const [showButton, setShowButton] = React.useState(false);
@@ -62,18 +73,35 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                     {appointment.status === "scheduled" ? "Confirmada" : "Cancelada"}
                 </span>
             </div>
-            {showButton && (
-                <div className={`mt-2 pt-2 self-center transition-all ease-in-out duration-1000`}>
-                    <Button
-                        className="w-full"
-                        variant={appointment.status === "scheduled" ? "destructive" : "outline"}
-                        aria-label="Cancelar visita"
-                        onClick={(e) => appointment.status === "scheduled" && handleCancelAppointment(e)}
-                    >
-                        {appointment.status === "scheduled" ? "Cancelar cita" : "Reagendar cita"}
-                    </Button>
-                </div>
-            )}
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    {showButton && (
+                        <Button
+                            className="w-fit self-center"
+                            variant={appointment.status === "scheduled" ? "destructive" : "outline"}
+                            aria-label="Cancelar visita"
+                        >
+                            {appointment.status === "scheduled" ? "Cancelar cita" : "Reagendar cita"}
+                        </Button>
+                    )}
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Cuidado!</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {appointment.status === "scheduled" 
+                                ? "Esta acción cancelará la cita programada."
+                                : "Esta acción te permitirá reagendar la cita."}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={(e) => appointment.status === "scheduled" && handleCancelAppointment(e)}>
+                            Continuar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

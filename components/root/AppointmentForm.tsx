@@ -189,7 +189,7 @@ const AppointmentForm = () => {
                 </DialogHeader>
                 <DialogHeader>
                     <DialogTitle>
-                        <div className="items-start text-center">
+                        <div className="items-start text-left">
                             <span className="font-extralight">Nombre: </span>
                             <span>{values.patient_name}</span>
                             <br />
