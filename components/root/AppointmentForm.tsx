@@ -189,7 +189,7 @@ const AppointmentForm = () => {
                 </DialogHeader>
                 <DialogHeader>
                     <DialogTitle>
-                        <div className="items-start text-left">
+                        <div className="items-start text-left tracking-wide leading-5">
                             <span className="font-extralight">Nombre: </span>
                             <span>{values.patient_name}</span>
                             <br />
@@ -237,10 +237,10 @@ const AppointmentForm = () => {
         onSuccess: () => {
             toast.success("Se guardo tu dia exitosamente.", {
                 description: `La visita se agendo exitosamente`,
-                action: {
-                    label: "OK",
-                    onClick: () => console.log("OK"),
-                },
+                // action: {
+                //     label: "OK",
+                //     onClick: () => console.log("OK"),
+                // },
                 duration: 10000,
             });
 
@@ -402,7 +402,7 @@ const AppointmentForm = () => {
                 <div className="flex justify-end py-6 ">
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button type="submit" variant="outline">
+                            <Button type="submit" variant="outline" disabled={!form.formState.isValid}>
                                 Agendar
                             </Button>
                         </DialogTrigger>
