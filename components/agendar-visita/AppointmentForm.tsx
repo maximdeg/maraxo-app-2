@@ -53,11 +53,22 @@ const formSchema = z.object({
     last_name: z.string().min(2, {
         message: "El apellido debe tener al menos 2 caracteres.",
     }),
-    phone_number: z.string().min(10, {
-        message: "El número de teléfono debe tener 10 caracteres.",
-    }),
+    phone_number: z.string()
+        .min(10, {
+            message: "El número de teléfono debe tener al menos 10 caracteres.",
+        })
+        .max(15, {
+            message: "El número de teléfono no puede tener más de 15 caracteres.",
+        })
+        .regex(/^[0-9+\-\s()]+$/, {
+            message: "El número de teléfono solo puede contener números, espacios, guiones, paréntesis y el símbolo +.",
+        }),
     visit_type: z.string().nonempty("Por favor seleccione un tipo de visita."),
-    appointment_date: z.date().min(new Date(), { message: "Hoy ya no hay visitas disponibles, por favor elija una fecha futura." }),
+    appointment_date: z.date().refine((date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+    }, { message: "La fecha debe ser hoy o una fecha futura." }),
     consult_type: z.string({
         required_error: "Por favor seleccione un tipo de consulta.",
     }),
@@ -126,7 +137,7 @@ const AppointmentForm = () => {
 
     const selectTimesComponent = useMemo(() => {
         return <AvailableTimesComponent selectedDate={userSelectedDate as Date} form={form} />;
-    }, [userSelectedDate]);
+    }, [userSelectedDate, form]);
 
     const OptionComponents: OptionComponentMap = {
         1: (
@@ -229,26 +240,30 @@ const AppointmentForm = () => {
         setConfirmationInfo(AppointmentInfoComponent);
     };
 
-    const { mutateAsync: addNewPatientAndAppointmentMutation } = useMutation({
+    const { mutateAsync: addNewPatientAndAppointmentMutation, isPending } = useMutation({
         mutationFn: async (variables: { appointment: NewAppointmentInfo }) => {
             return addNewPatientAndAppointment(variables);
         },
-        onMutate: () => {},
+        onMutate: () => {
+            toast.loading("Agendando su cita...", {
+                duration: Infinity,
+            });
+        },
         onSuccess: () => {
+            toast.dismiss();
             toast.success("Se guardo tu dia exitosamente.", {
                 description: `La visita se agendo exitosamente`,
-                // action: {
-                //     label: "OK",
-                //     onClick: () => console.log("OK"),
-                // },
                 duration: 10000,
             });
 
             console.log("🟢 Appointment booked successfully!");
             clearForm();
         },
-        onError: () => {
-            toast.warning("No se ha agendado correctamente. Intente nuevamente mas tarde.");
+        onError: (error) => {
+            toast.dismiss();
+            toast.error("No se ha agendado correctamente.", {
+                description: error.message || "Intente nuevamente mas tarde.",
+            });
         },
     });
 
@@ -402,8 +417,12 @@ const AppointmentForm = () => {
                 <div className="flex justify-end py-6 ">
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button type="submit" variant="outline" disabled={!form.formState.isValid}>
-                                Agendar
+                            <Button 
+                                type="submit" 
+                                variant="outline" 
+                                disabled={!form.formState.isValid || isPending}
+                            >
+                                {isPending ? "Agendando..." : "Agendar"}
                             </Button>
                         </DialogTrigger>
                         {confirmationInfo}

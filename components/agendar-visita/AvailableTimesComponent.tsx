@@ -1,11 +1,17 @@
 import React, { useEffect } from "react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
 
 import { useQuery } from "@tanstack/react-query";
 import { getAvailableTimesByDate } from "@/lib/actions";
 
-const AvailableTimesComponent = ({ selectedDate, form }: { selectedDate: Date; form: any }) => {
+interface AvailableTimesComponentProps {
+    selectedDate: Date;
+    form: UseFormReturn<any>;
+}
+
+const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponentProps) => {
     const [times, setTimes] = React.useState<string[]>([]);
     const [receivedData, setReceivedData] = React.useState<{
         availableSlots: { start_time: string; end_time: string; is_working_day: boolean };

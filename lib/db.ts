@@ -1,14 +1,30 @@
 import { Pool } from "pg";
 
+// Validate required environment variables
+const requiredEnvVars = [
+    'POSTGRESQL_HOST',
+    'POSTGRESQL_PORT', 
+    'POSTGRESQL_USER',
+    'POSTGRESQL_PASSWORD'
+];
+
+for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+        throw new Error(`Missing required environment variable: ${envVar}`);
+    }
+}
+
 const pool = new Pool({
     host: process.env.POSTGRESQL_HOST,
     port: Number(process.env.POSTGRESQL_PORT),
     user: process.env.POSTGRESQL_USER,
     password: process.env.POSTGRESQL_PASSWORD,
     database: process.env.POSTGRESQL_DATABASE || "postgres",
-    ssl: {
-        // Required for secure connection to RDS (in many cases)
-        rejectUnauthorized: false, // For development/testing (less secure, see notes below)
+    ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: true,
+        ca: process.env.POSTGRESQL_CA_CERT,
+    } : {
+        rejectUnauthorized: false,
     },
 });
 

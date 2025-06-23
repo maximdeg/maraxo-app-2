@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="grid grid-rows-[10%_auto_10%] place-self-center h-screen min-w-full md:min-w-[500px] ">
             <AdminHeader />
             {children}
-            <AdminFooter />
+            {/* <AdminFooter /> */}
         </div>
     );
 };
