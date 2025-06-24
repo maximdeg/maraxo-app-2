@@ -6,6 +6,7 @@ import { Calendar, Clock, MapPin, Phone, Star, ArrowRight, Shield, Users, Award 
 import { Button } from "@/components/ui/button";
 import FooterRoot from "@/components/agendar-visita/FooterRoot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 
 export default function Home() {
@@ -45,23 +46,23 @@ export default function Home() {
         }
     ];
 
-    const testimonials = [
-        {
-            name: "María González",
-            text: "Excelente atención y resultados increíbles. Muy profesional.",
-            rating: 5
-        },
-        {
-            name: "Carlos Rodríguez",
-            text: "El Dr. John Doe es muy experto y la atención es personalizada.",
-            rating: 5
-        },
-        {
-            name: "Ana Martínez",
-            text: "Recomiendo totalmente. Resolvió mi problema de piel completamente.",
-            rating: 5
-        }
-    ];
+    // const testimonials = [
+    //     {
+    //         name: "María González",
+    //         text: "Excelente atención y resultados increíbles. Muy profesional.",
+    //         rating: 5
+    //     },
+    //     {
+    //         name: "Carlos Rodríguez",
+    //         text: "El Dr. John Doe es muy experto y la atención es personalizada.",
+    //         rating: 5
+    //     },
+    //     {
+    //         name: "Ana Martínez",
+    //         text: "Recomiendo totalmente. Resolvió mi problema de piel completamente.",
+    //         rating: 5
+    //     }
+    // ];
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -108,47 +109,75 @@ export default function Home() {
 
                 {/* Hero Section */}
                 <section className="pt-32 pb-20 px-6">
-                    <div className="container mx-auto text-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <h1 className="text-5xl md:text-7xl font-bold text-[#9e7162] mb-6 leading-tight">
-                                Tu Piel, Nuestra
-                                <span className="block text-[#ba8c84]">Especialidad</span>
-                            </h1>
-                            <p className="text-xl text-[#ba8c84] mb-8 max-w-2xl mx-auto leading-relaxed">
-                                Cuidamos de la salud y belleza de tu piel con la más alta tecnología y experiencia médica especializada.
-                            </p>
-                            
-                            <motion.div 
-                                className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
+                    <div className="container mx-auto">
+                        <div className="grid lg:grid-cols-2 gap-12 items-center">
+                            {/* Left Column - Image */}
+                            <motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8 }}
+                                className="order-2 lg:order-1 relative"
                             >
-                                <Link href="/agendar-visita">
-                                    <Button 
-                                        size="lg"
-                                        className="bg-gradient-to-r from-[#ba8c84] to-[#9e7162] hover:from-[#9e7162] hover:to-[#ba8c84] text-white px-10 py-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg font-semibold"
-                                    >
-                                        <Calendar className="w-6 h-6 mr-3" />
-                                        Agendar Mi Primera Cita
-                                        <ArrowRight className="w-5 h-5 ml-2" />
-                                    </Button>
-                                </Link>
-                                
-                                {/* <Button 
-                                    variant="outline" 
-                                    size="lg"
-                                    className="border-[#ba8c84] text-[#9e7162] hover:bg-[#ba8c84] hover:text-white px-8 py-4 rounded-full transition-all duration-300"
-                                >
-                                    <Phone className="w-5 h-5 mr-2" />
-                                    Llamar Ahora
-                                </Button> */}
+                                <div className="relative">
+                                    <CldImage
+                                        src="https://res.cloudinary.com/djdnlogf1/image/upload/v1750764738/karelys-ruiz-PqyzuzFiQfY-unsplash_espx0y.jpg" // Use this sample image or upload your own via the Media Explorer
+                                        width="500" 
+                                        height="400"
+                                        crop={{
+                                            type: "auto",
+                                            source: true,
+                                        }}
+                                        alt="Dermatología"
+                                        className="rounded-lg w-full h-full"
+                                    />
+                                    {/* Fade to right overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#f7e8e4] "></div>
+                                </div>
                             </motion.div>
-                        </motion.div>
+
+                            {/* Right Column - Text Content */}
+                            <motion.div
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8 }}
+                                className="order-1 lg:order-2 text-center lg:text-left md:ml-10"
+                            >
+                                <h1 className="text-5xl md:text-7xl font-bold text-[#9e7162] mb-6 leading-tight">
+                                    Tu Piel, Nuestra
+                                    <span className="block text-[#ba8c84]">Especialidad</span>
+                                </h1>
+                                <p className="text-xl text-[#ba8c84] mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                                    Cuidamos de la salud y belleza de tu piel con la más alta tecnología y experiencia médica especializada.
+                                </p>
+                                
+                                <motion.div 
+                                    className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center lg:items-start"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <Link href="/agendar-visita">
+                                        <Button 
+                                            size="lg"
+                                            className="bg-gradient-to-r from-[#ba8c84] to-[#9e7162] hover:from-[#9e7162] hover:to-[#ba8c84] text-white px-10 py-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg font-semibold"
+                                        >
+                                            <Calendar className="w-6 h-6 mr-3" />
+                                            Agendar Mi Primera Cita
+                                            <ArrowRight className="w-5 h-5 ml-2" />
+                                        </Button>
+                                    </Link>
+                                    
+                                    {/* <Button 
+                                        variant="outline" 
+                                        size="lg"
+                                        className="border-[#ba8c84] text-[#9e7162] hover:bg-[#ba8c84] hover:text-white px-8 py-4 rounded-full transition-all duration-300"
+                                    >
+                                        <Phone className="w-5 h-5 mr-2" />
+                                        Llamar Ahora
+                                    </Button> */}
+                                </motion.div>
+                            </motion.div>
+                        </div>
                     </div>
                 </section>
 
@@ -287,13 +316,14 @@ export default function Home() {
                             <p className="text-xl text-[#ba8c84] mb-8 max-w-2xl mx-auto">
                                 Agenda tu cita hoy mismo y comienza tu camino hacia una piel más saludable y radiante.
                             </p>
-                            
+
+
                             <Link href="/agendar-visita">
                                 <Button 
                                     size="lg"
                                     className="bg-gradient-to-r from-[#ba8c84] to-[#9e7162] hover:from-[#9e7162] hover:to-[#ba8c84] text-white px-12 py-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg font-semibold"
                                 >
-                                    <Calendar className="w-6 h-6 mr-3" />
+                                    <Calendar className="w-6 h-6 mr-3 text-white " />
                                     Agendar Cita Ahora
                                     <ArrowRight className="w-5 h-5 ml-2" />
                                 </Button>
