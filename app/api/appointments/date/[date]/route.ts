@@ -1,10 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<any> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ date: string }> }) {
     const appointmentsDate = (await params).date;
 
     try {
+        // Validate date format
+        if (!appointmentsDate || isNaN(Date.parse(appointmentsDate))) {
+            return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
+        }
+
         const appointments = await query(
             `
             SELECT
@@ -22,15 +27,18 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<a
             LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
             LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
             WHERE a.appointment_date = $1
+            ORDER BY a.appointment_time
         `,
             [appointmentsDate]
         );
-        if (appointments.rows.length === 0) {
-            return NextResponse.json({ error: "No appointments on this date" }, { status: 404 });
-        }
-        return NextResponse.json(appointments.rows, { status: 200 });
+        
+        return NextResponse.json({ 
+            appointments: appointments.rows,
+            count: appointments.rows.length,
+            date: appointmentsDate
+        }, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
-        return NextResponse.json({ error: "Failed to fetch day" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to fetch appointments for the specified date" }, { status: 500 });
     }
 }

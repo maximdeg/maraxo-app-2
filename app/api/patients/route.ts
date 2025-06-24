@@ -10,13 +10,19 @@ const getPatientId = async (phone_number: string) => {
         }
 
         return result.rows[0].id;
-    } catch (error) {}
+    } catch (error) {
+        console.error("Error in getPatientId:", error);
+        throw error;
+    }
 };
 
 export async function GET() {
     try {
         const patients = await query("SELECT * FROM patients ORDER BY last_name, first_name");
-        return NextResponse.json(patients.rows, { status: 200 });
+        return NextResponse.json({ 
+            patients: patients.rows,
+            count: patients.rows.length
+        }, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch patients" }, { status: 500 });
@@ -28,20 +34,40 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { first_name, last_name, phone_number } = body;
 
+        // Validate required fields
         if (!first_name || !last_name || !phone_number) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+            return NextResponse.json({ 
+                error: "Missing required fields",
+                required: ["first_name", "last_name", "phone_number"],
+                received: Object.keys(body)
+            }, { status: 400 });
         }
 
+        // Validate phone number format (basic validation)
+        const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+        if (!phoneRegex.test(phone_number)) {
+            return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
+        }
+
+        // Check if patient already exists
         const patientIdIfExists = await getPatientId(phone_number);
         if (patientIdIfExists) {
-            return NextResponse.json({ message: "Patient already exists", id: patientIdIfExists }, { status: 200 });
+            return NextResponse.json({ 
+                message: "Patient already exists", 
+                id: patientIdIfExists,
+                existing: true
+            }, { status: 200 });
         }
 
         const result = await query(
-            "INSERT INTO patients (first_name, last_name, phone_number) VALUES ($1, $2, $3) RETURNING id",
+            "INSERT INTO patients (first_name, last_name, phone_number) VALUES ($1, $2, $3) RETURNING id, first_name, last_name, phone_number",
             [first_name, last_name, phone_number]
         );
-        return NextResponse.json({ message: "Patient created successfully", id: result.rows[0].id }, { status: 201 });
+        
+        return NextResponse.json({ 
+            message: "Patient created successfully", 
+            patient: result.rows[0]
+        }, { status: 201 });
     } catch (error) {
         if (
             error instanceof Error &&

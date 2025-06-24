@@ -4,7 +4,7 @@ import { NewAppointmentInfo } from "./types";
 
 export const getAppointments = async (date: string) => {
     try {
-        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/date/${date}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments/date/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -12,50 +12,49 @@ export const getAppointments = async (date: string) => {
         });
 
         if (response.status === 404) {
-            return;
+            return null;
         }
         if (!response.ok) {
-            throw new Error("Error fetching appointments");
+            throw new Error(`Error fetching appointments: ${response.status}`);
         }
         const data = await response.json();
-
-        return data;
+        
+        // Return the appointments array directly to maintain compatibility with frontend
+        return data.appointments || data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in getAppointments:", error);
+        throw error;
     }
 };
 
 export const getUnavailableDay = async (date: string) => {
     try {
-        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-days/${date}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/unavailable-days/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         });
-
-        console.dir(JSON.stringify(response));
 
         if (response.status === 404) {
             return null;
         }
 
         if (!response.ok) {
-            console.log(JSON.stringify(response));
-            throw new Error("Error fetching unavailable days");
+            throw new Error(`Error fetching unavailable days: ${response.status}`);
         }
 
         const data = await response.json();
-
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in getUnavailableDay:", error);
+        throw error;
     }
 };
 
 export const addUnavailableDay = async (unavailable_date: Date, is_confirmed: boolean): Promise<any> => {
     try {
-        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-days`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/unavailable-days`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -64,23 +63,21 @@ export const addUnavailableDay = async (unavailable_date: Date, is_confirmed: bo
         });
 
         if (!response.ok) {
-            console.log(JSON.stringify(response));
-            throw new Error("Error adding unavailable day");
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Error adding unavailable day: ${response.status}`);
         }
 
-        console.log("ADDING DAY?");
-
         const data = await response.json();
-
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in addUnavailableDay:", error);
+        throw error;
     }
 };
 
 export const addUnavailableTime = async (workday_date: Date, start_time: string, end_time: string): Promise<any> => {
     try {
-        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-times`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/unavailable-times`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -89,15 +86,15 @@ export const addUnavailableTime = async (workday_date: Date, start_time: string,
         });
 
         if (!response.ok) {
-            console.log(JSON.stringify(response));
-            throw new Error("Error adding unavailable day");
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Error adding unavailable time: ${response.status}`);
         }
 
         const data = await response.json();
-
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in addUnavailableTime:", error);
+        throw error;
     }
 };
 
@@ -107,7 +104,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             throw new Error("Missing required patient information");
         }
 
-        const patientResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/patients`, {
+        const patientResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/patients`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -119,19 +116,21 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             }),
         });
 
-        if (patientResponse.ok) {
-            console.log("🟢 Patient booked successfully!");
-        } else {
+        if (!patientResponse.ok) {
             const errorData = await patientResponse.json();
-            console.log(`🔴 Patient registration failed: ${errorData.error || "Unknown error"}`);
+            throw new Error(`Patient registration failed: ${errorData.error || "Unknown error"}`);
         }
 
-        const { id } = await patientResponse.json();
+        const patientData = await patientResponse.json();
+        // Handle both new and old response formats
+        const patientId = patientData.id || patientData.patient?.id;
 
-        if (!id) throw Error("Servidor no pudo encargarse del usuario id.");
+        if (!patientId) {
+            throw new Error("Server could not process patient ID");
+        }
 
         const appointmentJSON = {
-            patient_id: id,
+            patient_id: patientId,
             appointment_date: appointment.appointment_date,
             appointment_time: appointment.appointment_time,
             consult_type_id: appointment.consult_type_id,
@@ -139,7 +138,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             notes: null,
         };
 
-        const appointmentResponse = await fetch(`http://localhost:3000/api/appointments`, {
+        const appointmentResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -148,63 +147,43 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
         });
 
         if (!appointmentResponse.ok) {
-            // const appointment_error = await appointmentResponse.json();
-            return console.log(`🔴 Appointment registration failed: ${appointmentResponse.status || "Unknown error"}`);
-            // throw new Error(appointmentResponse.status || "Unknown error");
+            const errorData = await appointmentResponse.json();
+            throw new Error(`Appointment registration failed: ${errorData.error || "Unknown error"}`);
         }
 
         const appointment_info = await appointmentResponse.json();
-
         return appointment_info;
     } catch (error) {
-        console.error(error);
+        console.error("Error in addNewPatientAndAppointment:", error);
+        throw error;
     }
 };
 
 export const getAvailableTimesByDate = async (date: string) => {
     try {
-        // const unavailableTimesResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/unavailable-times/${date}`, {
-        //     method: "GET",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        // });
-
-        // if (!unavailableTimesResponse.ok) {
-        //     console.log("Error fetching unavailable times");
-        // }
-
-        // const data = await unavailableTimesResponse.json();
-
-        // if (data.length > 0) {
-        //     return data;
-        // }
-
-        console.log("🟢 " + date);
-
-        const availableTimesResponse = await fetch(`${process.env.BACKEND_API_PROD}/api/available-times/${date}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/available-times/${date}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         });
 
-        if (!availableTimesResponse.ok) {
-            throw new Error("Error fetching available times");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Error fetching available times: ${response.status}`);
         }
 
-        const availableTimesData = await availableTimesResponse.json();
-        console.dir(availableTimesData);
-
-        return availableTimesData;
+        const data = await response.json();
+        return data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in getAvailableTimesByDate:", error);
+        throw error;
     }
 };
 
 export const cancelAppointment = async (id: string) => {
     try {
-        const response = await fetch(`${process.env.BACKEND_API_PROD}/api/appointments/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -212,13 +191,14 @@ export const cancelAppointment = async (id: string) => {
         });
 
         if (!response.ok) {
-            throw new Error("Error cancelling appointment");
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Error cancelling appointment: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Error in cancelAppointment:", error);
+        throw error;
     }
 };

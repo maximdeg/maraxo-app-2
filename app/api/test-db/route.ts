@@ -5,11 +5,20 @@ export async function GET() {
     try {
         console.log("🟠 Trying to connect to database...");
         const results = await query('SELECT 1 + 1 AS result');
-        console.log("🟢 Connected to database");
-        return NextResponse.json({ connection: 'success', result: results.rows }, { status: 200 });
+        console.log("🟢 Connected to database successfully");
+        
+        return NextResponse.json({ 
+            connection: 'success', 
+            result: results.rows[0],
+            timestamp: new Date().toISOString()
+        }, { status: 200 });
     } catch (error) {
         console.error('🔴 Database connection error:', error);
-        return NextResponse.json({ connection: 'failed', error: error }, { status: 500 });
+        return NextResponse.json({ 
+            connection: 'failed', 
+            error: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+        }, { status: 500 });
     }
 }
 
