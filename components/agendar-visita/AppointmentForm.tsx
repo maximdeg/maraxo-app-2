@@ -76,9 +76,8 @@ const formSchema = z.object({
 });
 
 const holidays = [
-    new Date("2025-01-01"), // New Year's Day
-    new Date("2025-04-21"), // Good Friday
-    new Date("2025-12-25"), // Christmas Day
+    new Date("2025-01-01"),
+    new Date("2025-12-25"), 
 ];
 
 const areDatesEqual = (date1: Date, date2: Date) => {

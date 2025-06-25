@@ -108,8 +108,8 @@ export default function Home() {
                 </motion.header>
 
                 {/* Hero Section */}
-                <section className="pt-32 pb-20 px-6">
-                    <div className="container mx-auto">
+                <section className="pt-32 pb-20 px-6 xl:pt-20 xl:pb-0 max-w-7xl mx-auto">
+                    <div className="h-full">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             {/* Left Column - Image */}
                             <motion.div
@@ -120,7 +120,7 @@ export default function Home() {
                             >
                                 <div className="relative">
                                     <CldImage
-                                        src="https://res.cloudinary.com/djdnlogf1/image/upload/v1750764738/karelys-ruiz-PqyzuzFiQfY-unsplash_espx0y.jpg" // Use this sample image or upload your own via the Media Explorer
+                                        src="https://res.cloudinary.com/djdnlogf1/image/upload/v1750794724/pexels-anna-nekrashevich-8058607_kxptnw.jpg" 
                                         width="500" 
                                         height="400"
                                         crop={{
