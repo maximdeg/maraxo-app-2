@@ -108,7 +108,7 @@ export default function Home() {
                 </motion.header>
 
                 {/* Hero Section */}
-                <section className="pt-32 pb-20 px-6 xl:pt-20 xl:pb-0 max-w-7xl mx-auto">
+                <section className="pt-32 pb-20 px-6 md:px-5 md:pt-25 md:pb-10 lg:px-1 lg:pt-20 lg:pb-0 max-w-9xl mx-auto">
                     <div className="h-full">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             {/* Left Column - Image */}
@@ -142,7 +142,7 @@ export default function Home() {
                                 transition={{ duration: 0.8 }}
                                 className="order-1 lg:order-2 text-center lg:text-left md:ml-10"
                             >
-                                <h1 className="text-5xl md:text-7xl font-bold text-[#9e7162] mb-6 leading-tight">
+                                <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#9e7162] mb-6 leading-tight">
                                     Tu Piel, Nuestra
                                     <span className="block text-[#ba8c84]">Especialidad</span>
                                 </h1>

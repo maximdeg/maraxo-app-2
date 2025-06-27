@@ -72,6 +72,9 @@ const formSchema = z.object({
     consult_type: z.string({
         required_error: "Por favor seleccione un tipo de consulta.",
     }),
+    practice_type: z.string({
+        required_error: "Por favor seleccione un tipo de consulta.",
+    }),
     appointment_time: z.string().nonempty("Por favor seleccione un horario."),
 });
 
@@ -130,6 +133,7 @@ const AppointmentForm = () => {
             visit_type: "",
             appointment_date: new Date(),
             consult_type: "",
+            practice_type: "",
             appointment_time: "",
         },
     });
@@ -168,10 +172,37 @@ const AppointmentForm = () => {
                 )}
             />
         ),
-        4: <div>Hidden component for Option 2</div>,
+        2: (
+            <FormField
+                control={form.control}
+                name="practice_type"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Tipo de practica</FormLabel>
+                        <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Seleccione su visita" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Prácticas</SelectLabel>
+                                        <SelectItem value="1">Criocirugía</SelectItem>
+                                        <SelectItem value="2">Electrocoagulación</SelectItem>
+                                        <SelectItem value="3">Biopsia</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        ),
     };
 
     const handleSelectChange = (value: string) => {
+        console.log(value);
         setSelectedOption(value);
     };
 
@@ -274,6 +305,7 @@ const AppointmentForm = () => {
                 phone_number: values.phone_number,
                 visit_type_id: +values.visit_type,
                 consult_type_id: +values.consult_type,
+                practice_type_id: values.visit_type === "2" ? +values.practice_type : 0,
                 appointment_date: values.appointment_date,
                 appointment_time: values.appointment_time,
             };

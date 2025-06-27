@@ -122,7 +122,6 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
         }
 
         const patientData = await patientResponse.json();
-        // Handle both new and old response formats
         const patientId = patientData.id || patientData.patient?.id;
 
         if (!patientId) {
@@ -135,6 +134,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             appointment_time: appointment.appointment_time,
             consult_type_id: appointment.consult_type_id,
             visit_type_id: appointment.visit_type_id,
+            practice_type_id: appointment.practice_type_id,
             notes: null,
         };
 

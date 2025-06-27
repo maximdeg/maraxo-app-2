@@ -21,11 +21,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 p.first_name as patient_first_name,
                 p.last_name as patient_last_name,
                 vt.name as visit_type_name,
-                ct.name as consult_type_name
+                ct.name as consult_type_name,
+                pt.name as practice_type_name
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
-            LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
             LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
+            LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
+            LEFT JOIN practice_types pt ON a.practice_type_id = pt.id
             WHERE a.appointment_date = $1
             ORDER BY a.appointment_time
         `,

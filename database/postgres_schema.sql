@@ -38,6 +38,25 @@ INSERT INTO visit_types (name, description) VALUES
     ('Online', 'Video or telehealth consultation.'),
     ('Phone Call', 'Consultation via phone call.');
 
+-- Practice Types Lookup Table
+CREATE TABLE practice_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- Insert practice types with specific ID for the empty one
+INSERT INTO practice_types (id, name, description) VALUES
+    (0, '', ''),
+    (1, 'Criocirugía', 'Surgical procedure using extreme cold to destroy abnormal tissue.'),
+    (2, 'Electrocoagulación', 'Surgical procedure that uses electrical current to coagulate tissue.'),
+    (3, 'Biopsia', 'Medical procedure to remove a sample of tissue for examination.');
+
+-- Reset the sequence to continue from the next available ID
+SELECT setval('practice_types_id_seq', (SELECT MAX(id) FROM practice_types));
+
 -- Appointments Table (No changes from previous schema)
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
@@ -128,6 +147,11 @@ EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER visit_types_updated_at_trigger
 BEFORE UPDATE ON visit_types
+FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER practice_types_updated_at_trigger
+BEFORE UPDATE ON practice_types
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 

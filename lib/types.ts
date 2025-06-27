@@ -8,6 +8,7 @@ export interface AppointmentInfo {
     patient_last_name: string;
     visit_type_name: string | null;
     consult_type_name: string | null;
+    practice_type_name: string | null;
 }
 
 export interface UnavailableDay {
@@ -21,6 +22,7 @@ export interface NewAppointmentInfo {
     phone_number: string;
     visit_type_id: number;
     consult_type_id: number;
+    practice_type_id: number;
     appointment_date: Date;
     appointment_time: string;
 }

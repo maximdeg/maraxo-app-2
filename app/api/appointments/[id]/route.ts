@@ -17,11 +17,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 p.first_name as patient_first_name,
                 p.last_name as patient_last_name,
                 ct.name as consult_type_name,
-                vt.name as visit_type_name
+                vt.name as visit_type_name,
+                pt.name as practice_type_name
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
-            LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
             LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
+            LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
+            LEFT JOIN practice_types pt ON a.practice_type_id = pt.id
             WHERE a.id = $1
         `,
             [appointmentId]
@@ -48,7 +50,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
         }
 
         const body = await _request.json();
-        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes } = body;
+        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes } = body;
 
         // Validate required fields
         if (!patient_id || !appointment_date || !appointment_time) {
@@ -97,8 +99,8 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
 
         const result = await query(
             `UPDATE appointments SET patient_id = $1, appointment_date = $2, appointment_time = $3,
-            consult_type_id = $4, visit_type_id = $5, notes = $6, updated_at = NOW() WHERE id = $7 RETURNING id`,
-            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, notes, appointmentId]
+            consult_type_id = $4, visit_type_id = $5, practice_type_id = $7, notes = $7,  updated_at = NOW() WHERE id = $7 RETURNING id`,
+            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes, appointmentId]
         );
         
         if (result.rowCount === 0) {
