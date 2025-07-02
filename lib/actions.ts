@@ -135,7 +135,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             consult_type_id: appointment.consult_type_id,
             visit_type_id: appointment.visit_type_id,
             practice_type_id: appointment.practice_type_id,
-            notes: null,
+            health_insurance: null,
         };
 
         const appointmentResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments`, {

@@ -32,7 +32,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes } = body;
+        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance } = body;
 
         // Validate required fields
         if (!patient_id || !appointment_date || !appointment_time) {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         }
 
         const result = await query(
-            `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes)
+            `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING 
             id,
@@ -83,8 +83,8 @@ export async function POST(req: NextRequest) {
             consult_type_id,
             visit_type_id,
             practice_type_id,
-            notes;`,
-            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes]
+            health_insurance;`,
+            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance]
         );
 
         if (result.rowCount === 0) {
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
                 ct.name AS consult_type_name,
                 vt.name AS visit_type_name,
                 pt.name AS practice_type_name,
-                a.notes
+                a.health_insurance
                 FROM appointments a
                 JOIN patients p ON a.patient_id = p.id
                 LEFT JOIN consult_types ct ON a.consult_type_id = ct.id

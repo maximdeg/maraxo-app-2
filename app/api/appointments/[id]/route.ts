@@ -50,7 +50,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
         }
 
         const body = await _request.json();
-        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes } = body;
+        const { patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance } = body;
 
         // Validate required fields
         if (!patient_id || !appointment_date || !appointment_time) {
@@ -99,8 +99,8 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
 
         const result = await query(
             `UPDATE appointments SET patient_id = $1, appointment_date = $2, appointment_time = $3,
-            consult_type_id = $4, visit_type_id = $5, practice_type_id = $7, notes = $7,  updated_at = NOW() WHERE id = $7 RETURNING id`,
-            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, notes, appointmentId]
+            consult_type_id = $4, visit_type_id = $5, practice_type_id = $6, health_insurance = $7,  updated_at = NOW() WHERE id = $8 RETURNING id`,
+            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance, appointmentId]
         );
         
         if (result.rowCount === 0) {

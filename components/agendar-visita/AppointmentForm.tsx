@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import React, { useState, useMemo } from "react";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { addNewPatientAndAppointment } from "@/lib/actions";
 import { NewAppointmentInfo } from "@/lib/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -35,8 +35,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import AvailableTimesComponent from "./AvailableTimesComponent";
-// import { Label } from "@/components/ui/label";
-// import { json } from "node:stream/consumers";
+
+
+
+
 interface Option {
     value: string;
     label: string;
@@ -75,6 +77,9 @@ const formSchema = z.object({
     practice_type: z.string({
         required_error: "Por favor seleccione un tipo de consulta.",
     }),
+    health_insurance: z.string({
+        required_error: "Por favor seleccione una obra social.",
+    }),
     appointment_time: z.string().nonempty("Por favor seleccione un horario."),
 });
 
@@ -82,6 +87,20 @@ const holidays = [
     new Date("2025-01-01"),
     new Date("2025-12-25"), 
 ];
+
+const getHealthInsuranceTypes = async (): Promise<Array<{ name: string; price: string | null; notes?: string }>> => {
+    try {
+        const response = await fetch('/api/health-insurance');
+        if (!response.ok) {
+            throw new Error('Failed to fetch health insurance data');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error loading health insurance types:', error);
+        return [];
+    }
+};
 
 const areDatesEqual = (date1: Date, date2: Date) => {
     return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
@@ -116,6 +135,12 @@ const AppointmentForm = () => {
     const limitDay = new Date(tomorrow);
     limitDay.setDate(tomorrow.getDate() + 30);
 
+    const { data: healthInsuranceTypes } = useQuery({
+        queryKey: ['health-insurance-types'],
+        queryFn: getHealthInsuranceTypes,
+    });
+
+
     // const selectTimesComponent = useCallback(() => {
     //     return <AvailableTimesComponent selectedDate={userSelectedDate as Date} />;
     // }, [userSelectedDate]);
@@ -131,6 +156,7 @@ const AppointmentForm = () => {
             last_name: "",
             phone_number: "",
             visit_type: "",
+            health_insurance: "",  
             appointment_date: new Date(),
             consult_type: "",
             practice_type: "",
@@ -305,6 +331,7 @@ const AppointmentForm = () => {
                 phone_number: values.phone_number,
                 visit_type_id: +values.visit_type,
                 consult_type_id: +values.consult_type,
+                health_insurance: values.health_insurance,
                 practice_type_id: values.visit_type === "2" ? +values.practice_type : 0,
                 appointment_date: values.appointment_date,
                 appointment_time: values.appointment_time,
@@ -406,6 +433,42 @@ const AppointmentForm = () => {
                     )}
                 />
                 {OptionComponents[selectedOption]}
+                
+                <FormField
+                    control={form.control}
+                    name="health_insurance"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Obra social</FormLabel>
+                                <FormDescription>
+                                    Seleccione &quot;Particular&quot; o &quot;Practica Particular&quot; si no tiene obra social.
+                                </FormDescription> 
+                            <FormControl>
+                                <Select
+                                    onValueChange={(value) => {
+                                        handleSelectChange(value);
+                                        field.onChange(value);
+                                    }}
+                                    defaultValue={field.value}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Seleccione su obra social" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {healthInsuranceTypes?.map((type) => (
+                                                <SelectItem key={type.name} value={type.name}>
+                                                    {type.name} {type.price ? `(${type.price})` : ""}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField
                     control={form.control}
                     name="appointment_date"

@@ -19,6 +19,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 a.appointment_time,
                 a.status,
                 p.first_name as patient_first_name,
+                a.health_insurance as patient_health_insurance,
                 p.last_name as patient_last_name,
                 vt.name as visit_type_name,
                 ct.name as consult_type_name,

@@ -22,6 +22,7 @@ export interface NewAppointmentInfo {
     phone_number: string;
     visit_type_id: number;
     consult_type_id: number;
+    health_insurance: string;
     practice_type_id: number;
     appointment_date: Date;
     appointment_time: string;

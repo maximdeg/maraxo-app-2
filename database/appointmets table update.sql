@@ -52,3 +52,4 @@ ALTER TABLE appointments
 ADD CONSTRAINT fk_visit_type
 FOREIGN KEY (visit_type_id) 
 REFERENCES visit_types(id);
+
