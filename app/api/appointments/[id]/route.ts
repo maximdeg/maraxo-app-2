@@ -5,8 +5,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const appointmentId = (await params).id;
 
     try {
-        // Validate ID format
-        if (!appointmentId || isNaN(Number(appointmentId))) {
+        // Validate ID format (UUID)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!appointmentId || !uuidRegex.test(appointmentId)) {
             return NextResponse.json({ error: "Invalid appointment ID format" }, { status: 400 });
         }
 
@@ -44,8 +45,9 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
     const appointmentId = (await params).id;
     
     try {
-        // Validate ID format
-        if (!appointmentId || isNaN(Number(appointmentId))) {
+        // Validate ID format (UUID)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!appointmentId || !uuidRegex.test(appointmentId)) {
             return NextResponse.json({ error: "Invalid appointment ID format" }, { status: 400 });
         }
 
@@ -118,8 +120,9 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
     try {
         const appointmentId = (await params).id;
 
-        // Validate ID format
-        if (!appointmentId || isNaN(Number(appointmentId))) {
+        // Validate ID format (UUID)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!appointmentId || !uuidRegex.test(appointmentId)) {
             return NextResponse.json({ error: "Invalid appointment ID format" }, { status: 400 });
         }
 

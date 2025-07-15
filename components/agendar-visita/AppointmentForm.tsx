@@ -1,7 +1,6 @@
 "use client";
 
 import type { JSX } from "react";
-import { Check } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import React, { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -24,16 +24,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import AvailableTimesComponent from "./AvailableTimesComponent";
 
 
@@ -124,10 +114,10 @@ const disabledDays = (day: Date) => {
 };
 
 const AppointmentForm = () => {
+    const router = useRouter();
     const [date, setDate] = useState();
     const [userSelectedDate, setUserSelectedDate] = useState<Date>();
     const [selectedOption, setSelectedOption] = useState<string>("");
-    const [confirmationInfo, setConfirmationInfo] = useState<React.ReactNode>();
 
     const today = new Date();
     const tomorrow = new Date(today);
@@ -232,6 +222,10 @@ const AppointmentForm = () => {
         setSelectedOption(value);
     };
 
+    const handleHealthInsuranceChange = (value: string) => {
+        console.log("Health insurance selected:", value);
+    };
+
     const handleDateChange = (value: Date) => {
         console.log(value);
         setUserSelectedDate(() => value);
@@ -244,56 +238,25 @@ const AppointmentForm = () => {
         form.reset();
     };
 
-    const showModalInfo = (values: any) => {
-        const AppointmentInfoComponent: React.ReactNode = (
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="flex gap-2 items-center text-green-400 text-2xl text-center">
-                        <Check className="h-8 w-8" />
-                        Visita agendada con exito
-                    </DialogTitle>
-                    <DialogDescription className="text-white text-center">Asegurese que toda la informacion es correcta</DialogDescription>
-                </DialogHeader>
-                <DialogHeader>
-                    <DialogTitle>
-                        <div className="items-start text-left tracking-wide leading-5">
-                            <span className="font-extralight">Nombre: </span>
-                            <span>{values.patient_name}</span>
-                            <br />
-                            <span className="font-extralight ">Telefono: </span>
-                            <span>{values.phone_number}</span>
-                            <br />
-                            <span className="font-extralight ">Tipo de visita: </span>
-                            <span>{values.visit_type_name}</span>
-                            <br />
-                            {values.visit_type_name === "consulta" && (
-                                <>
-                                    <span className="font-extralight ">Tipo de consulta: </span>
-                                    <span>{values.consult_type_name}</span>
-                                    <br />
-                                </>
-                            )}
-                            <span className="font-extralight ">Fecha: </span>
-                            <span>{format(values.appointment_date, "dd/MM/yyyy")}</span>
-                            <br />
-                            <span className="font-extralight ">Horario: </span>
-                            <span>{values.appointment_time}</span>
-                            <br />
-                        </div>
-                    </DialogTitle>
-                </DialogHeader>
+    const redirectToConfirmation = (values: any) => {
+        const params = new URLSearchParams({
+            patient_name: values.patient_name,
+            phone_number: values.phone_number,
+            visit_type_name: values.visit_type_name,
+            appointment_date: values.appointment_date,
+            appointment_time: values.appointment_time,
+            appointment_id: values.id || "",
+        });
 
-                <DialogFooter className="justify-end">
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                            Cerrar
-                        </Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-        );
+        if (values.consult_type_name) {
+            params.append("consult_type_name", values.consult_type_name);
+        }
 
-        setConfirmationInfo(AppointmentInfoComponent);
+        if (values.practice_type_name) {
+            params.append("practice_type_name", values.practice_type_name);
+        }
+
+        router.push(`/confirmation?${params.toString()}` as any);
     };
 
     const { mutateAsync: addNewPatientAndAppointmentMutation, isPending } = useMutation({
@@ -313,7 +276,6 @@ const AppointmentForm = () => {
             });
 
             console.log("🟢 Appointment booked successfully!");
-            clearForm();
         },
         onError: (error) => {
             toast.dismiss();
@@ -341,7 +303,7 @@ const AppointmentForm = () => {
                 appointment: newAppointmentInfo,
             });
 
-            showModalInfo(response.appointment_info);
+            redirectToConfirmation(response.appointment_info);
         } catch (error) {
             console.error("🟠 Fetch error:", error);
         }
@@ -349,7 +311,7 @@ const AppointmentForm = () => {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-sm mx-auto">
                 <FormField
                     control={form.control}
                     name="first_name"
@@ -440,13 +402,13 @@ const AppointmentForm = () => {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Obra social</FormLabel>
-                                <FormDescription>
+                                {/* <FormDescription>
                                     Seleccione &quot;Particular&quot; o &quot;Practica Particular&quot; si no tiene obra social.
-                                </FormDescription> 
+                                </FormDescription>  */}
                             <FormControl>
                                 <Select
                                     onValueChange={(value) => {
-                                        handleSelectChange(value);
+                                        handleHealthInsuranceChange(value);
                                         field.onChange(value);
                                     }}
                                     defaultValue={field.value}
@@ -456,11 +418,20 @@ const AppointmentForm = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            {healthInsuranceTypes?.map((type) => (
-                                                <SelectItem key={type.name} value={type.name}>
-                                                    {type.name} {type.price ? `(${type.price})` : ""}
-                                                </SelectItem>
-                                            ))}
+                                            {healthInsuranceTypes?.map((type) => {
+                                                if (selectedOption === "1" && type.name === "Practica Particular") {
+                                                    return null;
+                                                }
+                                                if (selectedOption === "2" && type.name === "Particular") {
+                                                    return null;
+                                                }
+                                                
+                                                return (
+                                                    <SelectItem key={type.name} value={type.name}>
+                                                        {type.name} {type.price ? `(${type.price})` : ""}
+                                                    </SelectItem>
+                                                );
+                                            })}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -509,18 +480,13 @@ const AppointmentForm = () => {
                 />
                 {selectTimesComponent}
                 <div className="flex justify-end py-6 ">
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button 
-                                type="submit" 
-                                variant="outline" 
-                                disabled={!form.formState.isValid || isPending}
-                            >
-                                {isPending ? "Agendando..." : "Agendar"}
-                            </Button>
-                        </DialogTrigger>
-                        {confirmationInfo}
-                    </Dialog>
+                    <Button 
+                        type="submit" 
+                        variant="outline" 
+                        disabled={!form.formState.isValid || isPending}
+                    >
+                        {isPending ? "Agendando..." : "Agendar"}
+                    </Button>
                 </div>
             </form>
         </Form>

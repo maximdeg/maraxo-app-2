@@ -1,7 +1,7 @@
 import React from "react";
 import { AppointmentInfo } from "@/lib/types";
 import { Button } from "../ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelAppointment } from "@/lib/actions";
 import { toast } from "sonner";
 import {
@@ -18,16 +18,57 @@ import {
 
 const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
     const [showButton, setShowButton] = React.useState(false);
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+    const queryClient = useQueryClient();
 
-    const { mutateAsync: cancelAppointmentMutation } = useMutation({
+    const { mutateAsync: cancelAppointmentMutation, isPending } = useMutation({
         mutationFn: async (variables: { appointment: AppointmentInfo }) => {
             return cancelAppointment(appointment.id);
         },
-        onMutate: () => {
-            // mutate
+        onMutate: async () => {
+            // Cancel any outgoing refetches for all appointment queries
+            await queryClient.cancelQueries({ queryKey: ["appointments"] });
+
+            // Get all appointment queries and update them optimistically
+            const queries = queryClient.getQueriesData({ queryKey: ["appointments"] });
+            
+            // Snapshot the previous values
+            const previousQueries = queries.map(([queryKey, data]) => ({ queryKey, data }));
+
+            // Update all appointment queries optimistically
+            queries.forEach(([queryKey, data]) => {
+                if (data && Array.isArray(data)) {
+                    queryClient.setQueryData(queryKey, (old: any) => {
+                        if (!old) return old;
+                        
+                        // Update the specific appointment status to cancelled
+                        return old.map((apt: AppointmentInfo) => 
+                            apt.id === appointment.id 
+                                ? { ...apt, status: "cancelled" }
+                                : apt
+                        );
+                    });
+                }
+            });
+
+            // Return a context object with the snapshotted values
+            return { previousQueries };
+        },
+        onError: (err, variables, context) => {
+            // If the mutation fails, use the context returned from onMutate to roll back
+            if (context?.previousQueries) {
+                context.previousQueries.forEach(({ queryKey, data }) => {
+                    queryClient.setQueryData(queryKey, data);
+                });
+            }
+            toast.warning("No se ha cancelado correctamente.");
         },
         onSuccess: () => {
-            toast.success("Se guardo tu dia exitosamente.", {
+            // Close the dialog
+            setIsDialogOpen(false);
+            setShowButton(false);
+            
+            toast.success("Se cancelo la visita.", {
                 description: `La visita se cancelo exitosamente`,
                 action: {
                     label: "OK",
@@ -35,9 +76,13 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                 },
                 duration: 10000,
             });
+            
+            // Invalidate and refetch to ensure data consistency
+            queryClient.invalidateQueries({ queryKey: ["appointments"] });
         },
-        onError: () => {
-            toast.warning("No se ha cancelado correctamente.");
+        onSettled: () => {
+            // Always refetch after error or success
+            queryClient.invalidateQueries({ queryKey: ["appointments"] });
         },
     });
 
@@ -48,36 +93,72 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
         cancelAppointmentMutation({ appointment });
     };
 
+    const getStatusInfo = (status: string) => {
+        switch (status) {
+            case "scheduled":
+                return {
+                    label: "Confirmada",
+                    className: "bg-green-100 text-green-800 border-green-200",
+                    icon: "✓"
+                };
+            case "cancelled":
+                return {
+                    label: "Cancelada",
+                    className: "bg-red-100 text-red-800 border-red-200",
+                    icon: "✗"
+                };
+            default:
+                return {
+                    label: "Programada",
+                    className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+                    icon: "⏳"
+                };
+        }
+    };
+
+    const statusInfo = getStatusInfo(appointment.status);
+
     return (
         <div
             key={appointment.id}
-            className="p-4 border rounded-lg shadow-sm flex flex-col transition-all ease-in-out duration-1000 "
+            className="p-6 border rounded-xl shadow-sm hover:shadow-md transition-all ease-in-out duration-300 bg-[#cabab5] shadow-inner shadow-black/10"
             tabIndex={0}
             onClick={() => setShowButton(!showButton)}
         >
-            <div className="flex justify-between items-center">
-                <div>
-                    <p className="font-semibold text-2xl">
+            {/* Header with Patient Name and Status */}
+            <div className="flex justify-between items-start">
+                <div className="flex-1">
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">
                         {appointment.patient_first_name} {appointment.patient_last_name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                        {appointment.appointment_time} - {appointment.visit_type_name}
-                    </p>
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        {/* <span className="font-medium">📅 {appointment.appointment_date}</span> */}
+                        <span className="font-medium">🕐 {appointment.appointment_time}</span>
+                    </div>
+                    {appointment.visit_type_name && (
+                    <div className="flex items-center gap-2 text-sm">
+                        <span className="text-black font-medium min-w-[80px]">Tipo de visita:</span>
+                        <span className="text-gray-700 bg-blue-50 px-2 py-1 rounded-md">
+                            {appointment.visit_type_name}{" | "}{appointment.visit_type_name === "Practica" ? appointment.practice_type_name : appointment.consult_type_name}
+                        </span>
+                    </div>
+                )}
                 </div>
-                <span
-                    aria-label={appointment.status === "scheduled" ? "Confirmada" : "Cancelada"}
-                    className={`px-2 py-1 text-lg rounded-full focus:bg-red-600 ${
-                        appointment.status === "scheduled" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    } `}
-                >
-                    {appointment.status === "scheduled" ? "Confirmada" : "Cancelada"}
-                </span>
+                <div className="flex items-center gap-2">
+                    <span
+                        className={`px-3 py-1.5 text-sm font-medium rounded-full border ${statusInfo.className}`}
+                    >
+                        <span className="mr-1">{statusInfo.icon}</span>
+                        {statusInfo.label}
+                    </span>
+                </div>
             </div>
-            <AlertDialog>
+
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
                     {showButton && (
                         <Button
-                            className="w-fit self-center"
+                            className="w-full mt-4"
                             variant={appointment.status === "scheduled" ? "destructive" : "outline"}
                             aria-label="Cancelar visita"
                         >
@@ -96,8 +177,12 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={(e) => appointment.status === "scheduled" && handleCancelAppointment(e)}>
-                            Continuar
+                        <AlertDialogAction 
+                            className="bg-red-500 text-white" 
+                            onClick={(e) => appointment.status === "scheduled" && handleCancelAppointment(e)}
+                            disabled={isPending}
+                        >
+                            {isPending ? "Cancelando..." : "Cancelar visita"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
