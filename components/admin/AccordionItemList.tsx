@@ -3,7 +3,7 @@ import { AppointmentInfo } from "@/lib/types";
 import AppointmentCard from "./AppointmentCard";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const AccordionItemList = memo(({ date, appointments }: { date: Date; appointments: AppointmentInfo[] }) => {
+const AccordionItemList = memo(({ date, appointments = [] }: { date: Date; appointments?: AppointmentInfo[] }) => {
     const days = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
     const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
