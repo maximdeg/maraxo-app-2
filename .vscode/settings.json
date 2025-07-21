@@ -1,20 +1,2 @@
 {
-    "dbcode.connections": [
-        {
-            "connectionId": "lxuORECFzF5PuvsV_39Zs",
-            "name": "db-maraxo-app",
-            "driver": "postgres",
-            "connectionType": "host",
-            "host": "db-maraxo-app.czckumyykodz.us-east-1.rds.amazonaws.com",
-            "port": 5432,
-            "ssl": true,
-            "username": "maxdev",
-            "password": "OAiqAkTT/fK64JIweRGtublCrhKhKba7FJroMC5cZdbg3KGt+w==",
-            "savePassword": "encrypted",
-            "salt": "wUR/neumIH9+q/lnGsDIVQ==",
-            "database": "postgres",
-            "readOnly": false,
-            "connectionTimeout": 30
-        }
-    ]
 }
