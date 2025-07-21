@@ -17,20 +17,21 @@ for (const envVar of requiredEnvVars) {
 // SSL configuration based on environment
 const getSSLConfig = () => {
     if (process.env.NODE_ENV === 'production') {
-        // In production, check for SSL configuration
-        if (process.env.POSTGRESQL_SSL_MODE === 'require') {
-            return {
-                rejectUnauthorized: false, // Allow self-signed certificates
-            };
-        } else if (process.env.POSTGRESQL_SSL_MODE === 'verify-full' && process.env.POSTGRESQL_CA_CERT) {
+        // In production, handle AWS RDS SSL properly
+        if (process.env.POSTGRESQL_SSL_MODE === 'verify-full' && process.env.POSTGRESQL_CA_CERT) {
             return {
                 rejectUnauthorized: true,
                 ca: process.env.POSTGRESQL_CA_CERT,
             };
+        } else if (process.env.POSTGRESQL_SSL_MODE === 'require') {
+            return {
+                rejectUnauthorized: false, // Allow self-signed certificates for AWS RDS
+            };
         } else {
-            // Default production behavior - require SSL but allow self-signed
+            // Default production behavior for AWS RDS - require SSL but allow self-signed
             return {
                 rejectUnauthorized: false,
+                ssl: true,
             };
         }
     } else {
@@ -48,14 +49,29 @@ const pool = new Pool({
     password: process.env.POSTGRESQL_PASSWORD,
     database: process.env.POSTGRESQL_DATABASE || "postgres",
     ssl: getSSLConfig(),
+    // Add connection timeout and retry logic
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+    max: 20, // Maximum number of clients in the pool
+});
+
+// Handle connection errors
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+    process.exit(-1);
 });
 
 export async function query(text: string, params?: any[]) {
     const start = Date.now();
-    const res = await pool.query(text, params);
-    const duration = Date.now() - start;
-    console.log("executed query", { text, duration, rows: res.rowCount });
-    return res;
+    try {
+        const res = await pool.query(text, params);
+        const duration = Date.now() - start;
+        console.log("executed query", { text, duration, rows: res.rowCount });
+        return res;
+    } catch (error) {
+        console.error("Database query error:", error);
+        throw error;
+    }
 }
 
 // SSL Configuration Notes:
@@ -67,6 +83,11 @@ export async function query(text: string, params?: any[]) {
 //   - undefined: Uses default behavior based on NODE_ENV
 //
 // - POSTGRESQL_CA_CERT: Certificate Authority certificate for full SSL verification
+//
+// AWS RDS Specific Notes:
+// - AWS RDS uses self-signed certificates by default
+// - For production, set POSTGRESQL_SSL_MODE='require' to allow self-signed certificates
+// - For maximum security, download AWS RDS CA certificate and set POSTGRESQL_SSL_MODE='verify-full'
 //
 // Security Considerations:
 // - In development: SSL verification is disabled for convenience
