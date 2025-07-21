@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { UseFormReturn } from "react-hook-form";
+"use client";
 
+import React, { useEffect, useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
 import { getAvailableTimesByDate } from "@/lib/actions";
 
@@ -12,11 +13,8 @@ interface AvailableTimesComponentProps {
 }
 
 const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponentProps) => {
-    const [times, setTimes] = React.useState<string[]>([]);
-    const [receivedData, setReceivedData] = React.useState<{
-        availableSlots: { start_time: string; end_time: string; is_working_day: boolean };
-        appointmentTimes: string[];
-    } | null>();
+    const [times, setTimes] = useState<string[]>([]);
+    const [receivedData, setReceivedData] = useState<any>(null);
 
     const createTimes = (startTime: string, endTime: string, appointmentTimes: string[]) => {
         setTimes([]);
@@ -60,15 +58,28 @@ const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponent
 
             const data = await getAvailableTimesByDate(formatedDate);
 
-            if (!data.availableSlots?.start_time || !data.availableSlots?.end_time) return [];
+            // Check if availableSlots is an array and has at least one item
+            if (!data.availableSlots || !Array.isArray(data.availableSlots) || data.availableSlots.length === 0) {
+                console.log("No available slots found");
+                return data;
+            }
+
+            // Use the first available slot for time generation
+            const firstSlot = data.availableSlots[0];
+            if (!firstSlot.start_time || !firstSlot.end_time) {
+                console.log("Invalid slot data:", firstSlot);
+                return data;
+            }
+
             setReceivedData(data);
             return data;
         },
     });
 
     useEffect(() => {
-        if (receivedData) {
-            createTimes(receivedData.availableSlots?.start_time, receivedData.availableSlots?.end_time, receivedData?.appointmentTimes);
+        if (receivedData && receivedData.availableSlots && Array.isArray(receivedData.availableSlots) && receivedData.availableSlots.length > 0) {
+            const firstSlot = receivedData.availableSlots[0];
+            createTimes(firstSlot.start_time, firstSlot.end_time, receivedData?.appointmentTimes || []);
         }
     }, [receivedData]);
 
@@ -93,17 +104,18 @@ const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponent
                                     <SelectLabel>Horarios disponibles</SelectLabel>
                                     {
                                         !isPending ? (
-                                            times.map((time) => (
-                                                <SelectItem key={time} value={time}>
-                                                    {time}
-                                                </SelectItem>
-                                            ))
+                                            times.length > 0 ? (
+                                                times.map((time) => (
+                                                    <SelectItem key={time} value={time}>
+                                                        {time}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="No hay horarios disponibles">No hay horarios disponibles</SelectItem>
+                                            )
                                         ) : (
                                             <SelectItem value="Cargando...">Cargando...</SelectItem>
                                         )
-                                        //  : (
-                                        //     <SelectItem value="No hay horarios disponibles">No hay horarios disponibles</SelectItem>
-                                        // )
                                     }
                                 </SelectGroup>
                             </SelectContent>
