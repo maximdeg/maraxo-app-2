@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Check, ArrowLeft, Home as HomeIcon, Calendar, MapPin, Phone, Info } from "lucide-react";
+import { Check, ArrowLeft, Home as HomeIcon, Calendar, MapPin, Phone, Info, Clock, FileText, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -95,7 +95,7 @@ const ConfirmationPage = () => {
                         </p>
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-4">
+                    <div className="grid gap-4">
                         {/* Appointment Details */}
                         <div className="bg-white/60 rounded-lg p-4 shadow-md">
                             <h2 className="text-lg font-semibold text-[#9e7162] mb-3 flex items-center">
@@ -156,30 +156,130 @@ const ConfirmationPage = () => {
                         </div>
 
                         {/* Important Information */}
-                        <div className="bg-white/60 rounded-lg p-4 shadow-md">
-                            <h2 className="text-lg font-semibold text-[#9e7162] mb-3 flex items-center">
-                                <Info className="w-4 h-4 mr-2" />
+                        <div className="bg-white/60 rounded-lg p-6 shadow-md text-black">
+                            <h2 className="text-xl font-semibold text-[#9e7162] mb-6 flex items-center">
+                                <Info className="w-5 h-5 mr-2" />
                                 Información Importante
                             </h2>
                             
-                            <div className="space-y-3">
-                                <div className="bg-blue-50 border-l-3 border-blue-400 p-3 rounded">
-                                    <h3 className="font-semibold text-blue-800 text-sm mb-1">Llegue 15 minutos antes</h3>
-                                    <p className="text-blue-700 text-xs">Para completar la documentación necesaria.</p>
+                            {/* General Guidelines */}
+                            <div className="space-y-4 mb-6">
+                                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                                    <h3 className="font-semibold text-blue-800 text-sm mb-2 flex items-center">
+                                        <Clock className="w-4 h-4 mr-2" />
+                                        Llegue 15 minutos antes
+                                    </h3>
+                                    <p className="text-blue-700 text-sm">Para completar la documentación necesaria.</p>
                                 </div>
                                 
-                                <div className="bg-yellow-50 border-l-3 border-yellow-400 p-3 rounded">
-                                    <h3 className="font-semibold text-yellow-800 text-sm mb-1">Documentación requerida</h3>
-                                    <ul className="text-yellow-700 text-xs space-y-0.5">
-                                        <li>• DNI o documento de identidad</li>
-                                        <li>• Carnet de obra social (si aplica)</li>
-                                        <li>• Estudios previos relacionados</li>
+                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                                    <h3 className="font-semibold text-yellow-800 text-sm mb-2 flex items-center">
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        Documentación requerida
+                                    </h3>
+                                    <ul className="text-yellow-700 text-sm space-y-1">
+                                        <li className="flex items-start">
+                                            <span className="mr-2">•</span>
+                                            <span>CONSULTA: Una orden de consulta ó credencial según corresponda con su obra social + coseguro por el uso del dermatoscopio.</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="mr-2">•</span>
+                                            <span>PRACTICA: IAPOS 20 bonos + coseguro, UNL + coseguro, resto de obras sociales según convenio (previamente autorizado o solo firma en dorso).</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="mr-2">•</span>
+                                            <span>Estudios previos relacionados</span>
+                                        </li>
                                     </ul>
                                 </div>
                                 
-                                <div className="bg-red-50 border-l-3 border-red-400 p-3 rounded">
-                                    <h3 className="font-semibold text-red-800 text-sm mb-1">Cancelación</h3>
-                                    <p className="text-red-700 text-xs">Si necesita cancelar, hágalo con al menos 24 horas de anticipación.</p>
+                                <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                                    <h3 className="font-semibold text-red-800 text-sm mb-2 flex items-center">
+                                        <AlertTriangle className="w-4 h-4 mr-2" />
+                                        Cancelación
+                                    </h3>
+                                    <p className="text-red-700 text-sm">Si necesita cancelar, hágalo con al menos 24 horas de anticipación. Respete que quizás otro paciente necesite un turno más cercano y el tiempo del profesional.</p>
+                                </div>
+                            </div>
+
+                            {/* Service Types */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-[#9e7162] mb-4">Tipos de Servicios</h3>
+                                <div className="space-y-4">
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-semibold text-gray-800 mb-2">CONSULTA</h4>
+                                        <p className="text-sm text-gray-700 mb-2">Consulta de Dermatología clínica y estética.</p>
+                                        <div className="bg-blue-50 p-3 rounded">
+                                            <h5 className="font-medium text-blue-800 text-sm mb-1">Qué tiene que traer?</h5>
+                                            <p className="text-sm text-blue-700">Una orden de consulta ó credencial según corresponda con su obra social más el coseguro por el uso del dermatoscopio, el cual se utiliza para el diagnóstico de múltiples patologías, control de nevos y seguimiento de los mismos. Dicho aparato no está nomenclado por obra social.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-semibold text-gray-800 mb-2">PRÁCTICA</h4>
+                                        <p className="text-sm text-gray-700 mb-2">Pacientes que ya tuvieron una consulta previa y requieren de biopsia, criocirugía o electrocoagulación de lesiones. No es un turno de consulta.</p>
+                                        <div className="bg-green-50 p-3 rounded">
+                                            <h5 className="font-medium text-green-800 text-sm mb-1">Qué tiene que traer?</h5>
+                                            <p className="text-sm text-green-700">IAPOS 20 bonos + coseguro, UNL + coseguro, resto de obras sociales según convenio (previamente autorizado o solo firma en dorso).</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-semibold text-gray-800 mb-2">URGENCIAS</h4>
+                                        <p className="text-sm text-gray-700 mb-2">Turnos para casos donde se necesita atención pronta, estos turnos son únicamente particular no por obra social.</p>
+                                        <div className="bg-orange-50 p-3 rounded">
+                                            <p className="text-sm text-orange-700 font-medium">Turnos URGENCIAS únicamente particular.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Aesthetic Treatments */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-[#9e7162] mb-4">Tratamientos Estéticos</h3>
+                                <div className="bg-purple-50 p-4 rounded-lg">
+                                    <p className="text-sm text-purple-800 mb-3">Consultar con la profesional otros tratamientos estéticos por costos, días y horarios:</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <div className="flex items-center">
+                                            <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                            <span className="text-sm text-purple-700">Toxina botulínica</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                            <span className="text-sm text-purple-700">Dermapen</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                            <span className="text-sm text-purple-700">Rellenos</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                            <span className="text-sm text-purple-700">Plasma rico en plaquetas</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                            <span className="text-sm text-purple-700">Skinbooster</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Contact Information */}
+                            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold text-[#9e7162] mb-3 flex items-center">
+                                    <Phone className="w-5 h-5 mr-2" />
+                                    Contacto
+                                </h3>
+                                <p className="text-sm text-gray-700 mb-3">Para cualquier inconveniente a la hora de tomar el turno o duda mandar WhatsApp a las secretarias:</p>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between bg-white/60 p-3 rounded">
+                                        <span className="font-medium text-gray-800">Clínica María del Rosario:</span>
+                                        <span className="text-green-600 font-semibold">342-439-3149</span>
+                                    </div>
+                                    <div className="flex items-center justify-between bg-white/60 p-3 rounded">
+                                        <span className="font-medium text-gray-800">Clínica de Recreo:</span>
+                                        <span className="text-green-600 font-semibold">342-582-2437</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

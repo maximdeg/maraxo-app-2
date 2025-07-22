@@ -268,10 +268,14 @@ const AppointmentForm = () => {
                 duration: Infinity,
             });
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.dismiss();
+            const message = data.is_existing_patient 
+                ? "Cita agendada exitosamente para paciente existente."
+                : "Cita agendada exitosamente para nuevo paciente.";
+            
             toast.success("Se guardo tu dia exitosamente.", {
-                description: `La visita se agendo exitosamente`,
+                description: message,
                 duration: 10000,
             });
 
