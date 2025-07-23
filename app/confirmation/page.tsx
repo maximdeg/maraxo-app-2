@@ -1,13 +1,14 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Check, ArrowLeft, Home as HomeIcon, Calendar, MapPin, Phone, Info, Clock, FileText, AlertTriangle } from "lucide-react";
+import { Check, ArrowLeft, Home as HomeIcon, Calendar, MapPin, Phone, Info, Clock, FileText, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import FooterRoot from "@/components/agendar-visita/FooterRoot";
+import { generateCancellationUrl, getCancellationExpirationTime } from "@/lib/cancellation-token";
 
 const ConfirmationPage = () => {
     const searchParams = useSearchParams();
@@ -21,6 +22,7 @@ const ConfirmationPage = () => {
     const appointmentTime = searchParams.get("appointment_time");
     const appointmentId = searchParams.get("appointment_id");
     const practiceTypeName = searchParams.get("practice_type_name");
+    const cancellationToken = searchParams.get("cancellation_token");
 
     const handleGoHome = () => {
         router.push("/");
@@ -308,6 +310,34 @@ const ConfirmationPage = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Cancellation Link */}
+                            {cancellationToken && (
+                                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <h3 className="text-sm font-semibold text-yellow-800 mb-2 flex items-center">
+                                        <X className="w-4 h-4 mr-2" />
+                                        ¿Necesita cancelar su cita?
+                                    </h3>
+                                    <p className="text-sm text-yellow-700 mb-3">
+                                        Si necesita cancelar su cita, puede hacerlo usando el siguiente enlace seguro:
+                                    </p>
+                                    <a 
+                                        href={`/cancelar-cita?token=${encodeURIComponent(cancellationToken)}`}
+                                        className="inline-block"
+                                    >
+                                        <Button 
+                                            variant="outline"
+                                            className="w-full border-red-300 text-red-700 hover:bg-red-50 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm"
+                                        >
+                                                                                    <X className="w-4 h-4 mr-2" />
+                                        Cancelar Cita
+                                    </Button>
+                                </a>
+                                    <p className="text-xs text-yellow-600 mt-2">
+                                        Este enlace es válido hasta 12 horas antes de su cita y es único para su cita.
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Action Buttons */}
                             <div className="mt-4 space-y-2">

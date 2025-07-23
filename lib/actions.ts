@@ -2,6 +2,7 @@
 
 import { NewAppointmentInfo } from "./types";
 import { query } from "./db";
+import { generateCancellationToken, verifyCancellationToken, isCancellationAllowed } from "./cancellation-token";
 
 export const getAppointments = async (date: string) => {
     try {
@@ -133,6 +134,15 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             throw new Error("Appointment already exists for this patient, date, and time");
         }
 
+        // Generate cancellation token
+        const cancellationToken = generateCancellationToken({
+            appointmentId: '', // Will be set after appointment creation
+            patientId: patientId.toString(),
+            patientPhone: appointment.phone_number,
+            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentTime: appointment.appointment_time,
+        });
+
         // Direct database query for appointment creation
         const appointmentResult = await query(
             `INSERT INTO appointments (
@@ -142,8 +152,9 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
                 consult_type_id, 
                 visit_type_id, 
                 practice_type_id, 
-                health_insurance
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+                health_insurance,
+                cancellation_token
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
             [
                 patientId,
                 appointment.appointment_date,
@@ -152,7 +163,23 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
                 appointment.visit_type_id,
                 appointment.practice_type_id,
                 appointment.health_insurance,
+                cancellationToken,
             ]
+        );
+
+        // Update the token with the actual appointment ID
+        const finalToken = generateCancellationToken({
+            appointmentId: appointmentResult.rows[0].id.toString(),
+            patientId: patientId.toString(),
+            patientPhone: appointment.phone_number,
+            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentTime: appointment.appointment_time,
+        });
+
+        // Update the appointment with the final token
+        await query(
+            `UPDATE appointments SET cancellation_token = $1 WHERE id = $2`,
+            [finalToken, appointmentResult.rows[0].id]
         );
 
         // Return appointment info with patient details for confirmation
@@ -166,7 +193,8 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
                 vt.name as visit_type_name,
                 ct.name as consult_type_name,
                 pt.name as practice_type_name,
-                a.health_insurance
+                a.health_insurance,
+                a.cancellation_token
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
@@ -247,19 +275,138 @@ export const getAvailableTimesByDate = async (date: string) => {
 
 export const cancelAppointment = async (id: string) => {
     try {
-        // Direct database query instead of HTTP request
+        // Update appointment status to cancelled instead of deleting
         const result = await query(
-            "DELETE FROM appointments WHERE id = $1 RETURNING *",
+            "UPDATE appointments SET status = 'cancelled', updated_at = NOW() WHERE id = $1 AND status != 'cancelled' RETURNING *",
             [id]
         );
         
         if (result.rows.length === 0) {
-            throw new Error("Appointment not found");
+            throw new Error("Appointment not found or already cancelled");
         }
         
         return result.rows[0];
     } catch (error) {
         console.error("Error in cancelAppointment:", error);
+        throw error;
+    }
+};
+
+export const cancelAppointmentByToken = async (token: string) => {
+    try {
+        // Verify the token
+        const decoded = verifyCancellationToken(token);
+        if (!decoded) {
+            throw new Error("Invalid or expired cancellation token");
+        }
+
+        // Check if appointment exists and is not already cancelled
+        const appointment = await query(
+            `SELECT 
+                a.id,
+                a.status,
+                a.cancellation_token,
+                p.phone_number
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            WHERE a.id = $1`,
+            [decoded.appointmentId]
+        );
+
+        if (appointment.rows.length === 0) {
+            throw new Error("Appointment not found");
+        }
+
+        if (appointment.rows[0].status === 'cancelled') {
+            throw new Error("Appointment is already cancelled");
+        }
+
+        // Check if cancellation is still allowed (more than 12 hours before appointment)
+        if (!isCancellationAllowed(decoded.appointmentDate, decoded.appointmentTime)) {
+            throw new Error("Cancellation is no longer allowed. Please contact the clinic directly.");
+        }
+
+        // Verify the token matches the stored token
+        if (appointment.rows[0].cancellation_token !== token) {
+            throw new Error("Invalid cancellation token");
+        }
+
+        // Verify the phone number matches
+        if (appointment.rows[0].phone_number !== decoded.patientPhone) {
+            throw new Error("Token verification failed");
+        }
+
+        // Cancel the appointment
+        const result = await query(
+            "UPDATE appointments SET status = 'cancelled', updated_at = NOW() WHERE id = $1 RETURNING *",
+            [decoded.appointmentId]
+        );
+
+        return {
+            success: true,
+            appointment: result.rows[0],
+            message: "Appointment cancelled successfully"
+        };
+    } catch (error) {
+        console.error("Error in cancelAppointmentByToken:", error);
+        throw error;
+    }
+};
+
+export const getAppointmentByToken = async (token: string) => {
+    try {
+        // Verify the token
+        const decoded = verifyCancellationToken(token);
+        if (!decoded) {
+            throw new Error("Invalid or expired cancellation token");
+        }
+
+        // Get appointment details
+        const appointment = await query(
+            `SELECT 
+                a.id,
+                a.appointment_date,
+                a.appointment_time,
+                a.status,
+                a.cancellation_token,
+                p.first_name,
+                p.last_name,
+                p.phone_number,
+                vt.name as visit_type_name,
+                ct.name as consult_type_name,
+                pt.name as practice_type_name,
+                a.health_insurance
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            LEFT JOIN visit_types vt ON a.visit_type_id = vt.id
+            LEFT JOIN consult_types ct ON a.consult_type_id = ct.id
+            LEFT JOIN practice_types pt ON a.practice_type_id = pt.id
+            WHERE a.id = $1`,
+            [decoded.appointmentId]
+        );
+
+        if (appointment.rows.length === 0) {
+            throw new Error("Appointment not found");
+        }
+
+        // Check if cancellation is still allowed (more than 12 hours before appointment)
+        if (!isCancellationAllowed(decoded.appointmentDate, decoded.appointmentTime)) {
+            throw new Error("Cancellation is no longer allowed. Please contact the clinic directly.");
+        }
+
+        // Verify the token matches the stored token
+        if (appointment.rows[0].cancellation_token !== token) {
+            throw new Error("Invalid cancellation token");
+        }
+
+        // Verify the phone number matches
+        if (appointment.rows[0].phone_number !== decoded.patientPhone) {
+            throw new Error("Token verification failed");
+        }
+
+        return appointment.rows[0];
+    } catch (error) {
+        console.error("Error in getAppointmentByToken:", error);
         throw error;
     }
 };

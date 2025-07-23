@@ -41,6 +41,14 @@ export default function Home() {
                     </div>
                     <div className="w-[100px] sm:w-[120px]"></div> {/* Spacer to balance the layout */}
                 </header>
+                {/* <div className="flex flex-col justify-start">
+                    <h6 className="text-md font-bold">Informacion importante</h6>
+                    <p className="text-xs">
+                        <span className="font-bold">Lunes a Viernes:</span> 08:00 - 18:00
+                        <br />
+                        <span className="font-bold">Sabado:</span> 08:00 - 12:00
+                    </p>
+                </div> */}
                 <AppointmentForm />
                 <FooterRoot />
             </section>

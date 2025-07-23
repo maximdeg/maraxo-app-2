@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const loading = () => {
     return (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 self-center justify-center items-center h-screen w-screen ">
             <div className="flex items-center space-x-4">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="space-y-2">

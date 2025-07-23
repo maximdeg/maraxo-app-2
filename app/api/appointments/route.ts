@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
+import { generateCancellationToken } from "@/lib/cancellation-token";
 
 export async function GET() {
     try {
@@ -73,9 +74,30 @@ export async function POST(req: NextRequest) {
             }, { status: 409 });
         }
 
+        // Get patient phone number for token generation
+        const patientInfo = await query(
+            "SELECT phone_number FROM patients WHERE id = $1",
+            [patient_id]
+        );
+
+        if (patientInfo.rows.length === 0) {
+            return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+        }
+
+        const patientPhone = patientInfo.rows[0].phone_number;
+
+        // Generate initial cancellation token
+        const initialToken = generateCancellationToken({
+            appointmentId: '', // Will be updated after creation
+            patientId: patient_id.toString(),
+            patientPhone: patientPhone,
+            appointmentDate: appointment_date,
+            appointmentTime: appointment_time,
+        });
+
         const result = await query(
-            `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO appointments (patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance, cancellation_token)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING 
             id,
             appointment_date,
@@ -84,12 +106,27 @@ export async function POST(req: NextRequest) {
             visit_type_id,
             practice_type_id,
             health_insurance;`,
-            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance]
+            [patient_id, appointment_date, appointment_time, consult_type_id, visit_type_id, practice_type_id, health_insurance, initialToken]
         );
 
         if (result.rowCount === 0) {
             return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
         }
+
+        // Update the token with the actual appointment ID
+        const finalToken = generateCancellationToken({
+            appointmentId: result.rows[0].id.toString(),
+            patientId: patient_id.toString(),
+            patientPhone: patientPhone,
+            appointmentDate: appointment_date,
+            appointmentTime: appointment_time,
+        });
+
+        // Update the appointment with the final token
+        await query(
+            `UPDATE appointments SET cancellation_token = $1 WHERE id = $2`,
+            [finalToken, result.rows[0].id]
+        );
 
         const newAppointmentInfo = await query(
             `  SELECT 
@@ -101,7 +138,8 @@ export async function POST(req: NextRequest) {
                 ct.name AS consult_type_name,
                 vt.name AS visit_type_name,
                 pt.name AS practice_type_name,
-                a.health_insurance
+                a.health_insurance,
+                a.cancellation_token
                 FROM appointments a
                 JOIN patients p ON a.patient_id = p.id
                 LEFT JOIN consult_types ct ON a.consult_type_id = ct.id

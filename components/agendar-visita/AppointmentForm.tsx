@@ -256,6 +256,11 @@ const AppointmentForm = () => {
             params.append("practice_type_name", values.practice_type_name);
         }
 
+        // Add cancellation token if available
+        if (values.cancellation_token) {
+            params.append("cancellation_token", values.cancellation_token);
+        }
+
         router.push(`/confirmation?${params.toString()}` as any);
     };
 
