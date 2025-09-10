@@ -1,0 +1,6 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="45" fill="#9e7162"/>
+  <circle cx="90" cy="72" r="21.599999999999998" fill="white"/>
+  <path d="M62.99999999999999 117C62.99999999999999 108 72 99.00000000000001 81 99.00000000000001H99.00000000000001C108 99.00000000000001 117 108 117 117V125.99999999999999H62.99999999999999V117Z" fill="white"/>
+  <text x="90" y="153" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="21.599999999999998" font-weight="bold">D</text>
+</svg>

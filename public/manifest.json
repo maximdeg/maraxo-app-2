@@ -1,0 +1,114 @@
+{
+  "name": "Dra. Mara Flamini - Dermatología",
+  "short_name": "Dra. Mara Flamini",
+  "description": "Aplicación para agendar citas con Dra. Mara Flamini - Especialista en Dermatología",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff3f0",
+  "theme_color": "#9e7162",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["medical", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.svg",
+      "sizes": "152x152",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.svg",
+      "sizes": "384x384",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Página principal de la aplicación"
+    },
+    {
+      "src": "/screenshots/mobile-screenshot.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil de la aplicación"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Agendar Cita",
+      "short_name": "Agendar",
+      "description": "Agendar una nueva cita médica",
+      "url": "/agendar-visita",
+      "icons": [
+        {
+          "src": "/icons/shortcut-agendar.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Cancelar Cita",
+      "short_name": "Cancelar",
+      "description": "Cancelar una cita existente",
+      "url": "/cancelar-cita",
+      "icons": [
+        {
+          "src": "/icons/shortcut-cancelar.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}
