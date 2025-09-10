@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { query } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Remove subscription from database
-    await db.query(
+    await query(
       'DELETE FROM push_subscriptions WHERE endpoint = $1',
       [subscription.endpoint]
     );

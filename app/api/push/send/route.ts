@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { query } from '@/lib/db';
 import webpush from 'web-push';
 
-// Configure web-push
-webpush.setVapidDetails(
-  'mailto:contacto@dra-mara-flamini.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+// Configure web-push (only if VAPID keys are available)
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    'mailto:contacto@dra-mara-flamini.com',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if VAPID keys are configured
+    if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+      return NextResponse.json(
+        { error: 'Push notifications not configured. VAPID keys missing.' },
+        { status: 503 }
+      );
+    }
+
     const { 
       title, 
       body, 
@@ -28,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get all active subscriptions
-    const subscriptions = await db.query(
+    const subscriptions = await query(
       'SELECT endpoint, p256dh_key, auth_key FROM push_subscriptions WHERE active = true'
     );
 
@@ -75,18 +85,18 @@ export async function POST(request: NextRequest) {
 
         await webpush.sendNotification(pushSubscription, payload);
         return { success: true, endpoint: subscription.endpoint };
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error sending notification:', error);
         
         // If subscription is invalid, mark as inactive
-        if (error.statusCode === 410) {
-          await db.query(
+        if (error?.statusCode === 410) {
+          await query(
             'UPDATE push_subscriptions SET active = false WHERE endpoint = $1',
             [subscription.endpoint]
           );
         }
         
-        return { success: false, endpoint: subscription.endpoint, error: error.message };
+        return { success: false, endpoint: subscription.endpoint, error: error?.message || 'Unknown error' };
       }
     });
 
