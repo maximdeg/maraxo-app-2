@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if cancellation is allowed
-        const canCancel = isCancellationAllowed(decoded);
+        const canCancel = isCancellationAllowed(decoded.appointmentDate, decoded.appointmentTime);
         if (!canCancel) {
-            return NextResponse.json({ 
-                error: "No se puede cancelar la cita. Debe cancelar al menos 24 horas antes de la cita." 
+            return NextResponse.json({
+                error: "No se puede cancelar la cita. Debe cancelar al menos 12 horas antes de la cita."
             }, { status: 400 });
         }
 

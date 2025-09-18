@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         const appointment = result.rows[0];
 
         // Check if cancellation is allowed
-        const canCancel = isCancellationAllowed(decoded);
+        const canCancel = isCancellationAllowed(decoded.appointmentDate, decoded.appointmentTime);
 
         return NextResponse.json({ 
             appointment: {

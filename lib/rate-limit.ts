@@ -16,11 +16,13 @@ export function rateLimit(
   const windowStart = now - windowMs
   
   // Clean up expired entries
-  for (const [key, entry] of rateLimitMap.entries()) {
+  const keysToDelete: string[] = []
+  rateLimitMap.forEach((entry, key) => {
     if (entry.resetTime < now) {
-      rateLimitMap.delete(key)
+      keysToDelete.push(key)
     }
-  }
+  })
+  keysToDelete.forEach(key => rateLimitMap.delete(key))
   
   const entry = rateLimitMap.get(identifier)
   

@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+// Remove crypto import - using web crypto API instead
 import { query } from './db';
 
 // JWT Secret - must be provided via environment variables
@@ -14,6 +14,9 @@ if (!JWT_SECRET) {
 if (JWT_SECRET.length < 32) {
   throw new Error('JWT_SECRET must be at least 32 characters long');
 }
+
+// Type assertion to tell TypeScript that JWT_SECRET is defined
+const JWT_SECRET_SAFE = JWT_SECRET as string;
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -60,7 +63,7 @@ export function generateToken(user: User): string {
             role: user.role,
             full_name: user.full_name 
         },
-        JWT_SECRET,
+        JWT_SECRET_SAFE,
         { expiresIn: '24h' }
     );
 }
@@ -68,7 +71,7 @@ export function generateToken(user: User): string {
 // JWT token verification
 export function verifyToken(token: string): any {
     try {
-        return jwt.verify(token, JWT_SECRET);
+        return jwt.verify(token, JWT_SECRET_SAFE);
     } catch (error) {
         return null;
     }
@@ -105,7 +108,10 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
 // Generate password reset token
 export async function generateResetToken(email: string): Promise<string | null> {
     try {
-        const resetToken = crypto.randomBytes(32).toString('hex');
+        // Generate a random token using web crypto API
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        const resetToken = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
         const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
 
         const result = await query(
