@@ -103,10 +103,8 @@ const disabledDays = (day: Date) => {
     limitDay.setDate(today.getDate() + 30);
 
     return (
-        dayOfWeek === 0 ||
-        dayOfWeek === 4 ||
-        dayOfWeek === 5 ||
-        dayOfWeek === 6 ||
+        dayOfWeek === 0 || // Sunday
+        dayOfWeek === 6 || // Saturday
         day < new Date() ||
         day > limitDay ||
         holidays.some((holiday) => areDatesEqual(holiday, day))
