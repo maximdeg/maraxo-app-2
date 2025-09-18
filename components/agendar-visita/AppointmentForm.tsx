@@ -24,7 +24,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-import AvailableTimesComponent from "./AvailableTimesComponent";
+import AvailableTimesComponent from "./AvailableTimesComponentImproved";
 
 
 

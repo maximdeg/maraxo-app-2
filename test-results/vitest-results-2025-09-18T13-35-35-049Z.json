@@ -1,0 +1,32 @@
+{
+  "testSuite": "vitest",
+  "startTime": "2025-09-18T13:35:28.022Z",
+  "tests": [
+    {
+      "file": "tests/time-selection-comprehensive.test.ts",
+      "success": false,
+      "output": "{\"numTotalTestSuites\":1,\"numPassedTestSuites\":0,\"numFailedTestSuites\":1,\"numPendingTestSuites\":0,\"numTotalTests\":0,\"numPassedTests\":0,\"numFailedTests\":0,\"numPendingTests\":0,\"numTodoTests\":0,\"startTime\":1758202530288,\"success\":false,\"testResults\":[{\"assertionResults\":[],\"startTime\":1758202530288,\"endTime\":1758202530288,\"status\":\"failed\",\"message\":\"Failed to load url C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts (resolved id: C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts). Does the file exist?\",\"name\":\"C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/tests/time-selection-comprehensive.test.ts\"}]}\n",
+      "error": "Command failed: npx vitest run tests/time-selection-comprehensive.test.ts --reporter=json\n\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n"
+    },
+    {
+      "file": "tests/api-available-times-comprehensive.test.ts",
+      "success": false,
+      "output": "{\"numTotalTestSuites\":1,\"numPassedTestSuites\":0,\"numFailedTestSuites\":1,\"numPendingTestSuites\":0,\"numTotalTests\":0,\"numPassedTests\":0,\"numFailedTests\":0,\"numPendingTests\":0,\"numTodoTests\":0,\"startTime\":1758202532017,\"success\":false,\"testResults\":[{\"assertionResults\":[],\"startTime\":1758202532017,\"endTime\":1758202532017,\"status\":\"failed\",\"message\":\"Failed to load url C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts (resolved id: C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts). Does the file exist?\",\"name\":\"C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/tests/api-available-times-comprehensive.test.ts\"}]}\n",
+      "error": "Command failed: npx vitest run tests/api-available-times-comprehensive.test.ts --reporter=json\n\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n"
+    },
+    {
+      "file": "tests/time-generation-logic.test.ts",
+      "success": false,
+      "output": "{\"numTotalTestSuites\":1,\"numPassedTestSuites\":0,\"numFailedTestSuites\":1,\"numPendingTestSuites\":0,\"numTotalTests\":0,\"numPassedTests\":0,\"numFailedTests\":0,\"numPendingTests\":0,\"numTodoTests\":0,\"startTime\":1758202533277,\"success\":false,\"testResults\":[{\"assertionResults\":[],\"startTime\":1758202533277,\"endTime\":1758202533277,\"status\":\"failed\",\"message\":\"Failed to load url C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts (resolved id: C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts). Does the file exist?\",\"name\":\"C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/tests/time-generation-logic.test.ts\"}]}\n",
+      "error": "Command failed: npx vitest run tests/time-generation-logic.test.ts --reporter=json\n\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n"
+    },
+    {
+      "file": "tests/time-synchronization.test.ts",
+      "success": false,
+      "output": "{\"numTotalTestSuites\":1,\"numPassedTestSuites\":0,\"numFailedTestSuites\":1,\"numPendingTestSuites\":0,\"numTotalTests\":0,\"numPassedTests\":0,\"numFailedTests\":0,\"numPendingTests\":0,\"numTodoTests\":0,\"startTime\":1758202534522,\"success\":false,\"testResults\":[{\"assertionResults\":[],\"startTime\":1758202534522,\"endTime\":1758202534522,\"status\":\"failed\",\"message\":\"Failed to load url C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts (resolved id: C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/__tests__/setup.ts). Does the file exist?\",\"name\":\"C:/Users/Maxim/work/Maraxo app/maraxo-app-2-main/tests/time-synchronization.test.ts\"}]}\n",
+      "error": "Command failed: npx vitest run tests/time-synchronization.test.ts --reporter=json\n\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n"
+    }
+  ],
+  "endTime": "2025-09-18T13:35:35.049Z",
+  "duration": 7027
+}

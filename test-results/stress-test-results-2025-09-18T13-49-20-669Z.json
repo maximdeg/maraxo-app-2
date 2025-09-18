@@ -1,0 +1,8 @@
+{
+  "testSuite": "stress",
+  "startTime": "2025-09-18T13:49:20.623Z",
+  "success": true,
+  "output": "🚀 Starting Time Selection Stress Test\n📅 Testing 100 dates\n🔄 Concurrent requests: 10\n\n📊 Test Results Summary:\n✅ Successful tests: 100\n❌ Failed tests: 0\n⏱️  Average response time: 0.00ms\n🕐 Total test time: 0.00s\n\n📅 Results by Day of Week:\n  Sunday: 15/15 (100.0%)\n  Monday: 15/15 (100.0%)\n  Tuesday: 14/14 (100.0%)\n  Wednesday: 14/14 (100.0%)\n  Thursday: 14/14 (100.0%)\n  Friday: 14/14 (100.0%)\n  Saturday: 14/14 (100.0%)\n\n⏰ Time Generation Results:\n  Average generated times: 24.0\n  Tests with generated times: 100\n  2024-01-01: 24 times generated\n  2024-01-02: 24 times generated\n  2024-01-03: 24 times generated\n  2024-01-04: 24 times generated\n  2024-01-05: 24 times generated\n\n🎯 Overall Success Rate: 100.0%\n🎉 Excellent! Time selection is working reliably.\n",
+  "endTime": "2025-09-18T13:49:20.669Z",
+  "duration": 46
+}

@@ -4,13 +4,31 @@ import path from 'path'
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: 'jsdom',
     globals: true,
-    setupFiles: ['./__tests__/setup.ts'],
+    setupFiles: ['./tests/setup.ts'],
+    css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'tests/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/coverage/**',
+        '**/dist/**',
+        '**/.next/**',
+        '**/build/**'
+      ]
+    }
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './'),
     },
   },
+  esbuild: {
+    target: 'node14'
+  }
 })
