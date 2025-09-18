@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function GET() {
     try {
         const workSchedule = await query("SELECT * FROM work_schedule ORDER BY day_of_week");

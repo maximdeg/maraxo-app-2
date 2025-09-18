@@ -2,6 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 import { generateCancellationToken } from "@/lib/cancellation-token";
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function GET() {
     try {
         const appointments = await query(

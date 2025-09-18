@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, getUserById } from '@/lib/auth';
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
     try {
         // Get token from HTTP-only cookie

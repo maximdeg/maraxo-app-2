@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateUser, generateToken } from '@/lib/auth';
 import { rateLimit, getClientIP, createRateLimitResponse } from '@/lib/rate-limit';
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
     try {
         // Rate limiting

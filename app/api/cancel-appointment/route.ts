@@ -3,6 +3,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/lib/db";
 import { verifyCancellationToken, isCancellationAllowed } from "@/lib/cancellation-token";
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

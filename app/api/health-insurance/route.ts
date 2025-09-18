@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function GET() {
     try {
         const filePath = join(process.cwd(), 'data', 'obras-sociales.json');

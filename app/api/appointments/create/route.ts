@@ -3,6 +3,9 @@ import { NewAppointmentInfo } from '@/lib/types';
 import { query } from '@/lib/db';
 import { generateCancellationToken } from '@/lib/cancellation-token';
 
+// Ensure this runs in Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
     try {
         const appointment: NewAppointmentInfo = await request.json();
