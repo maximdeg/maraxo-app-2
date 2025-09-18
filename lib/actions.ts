@@ -139,7 +139,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             appointmentId: '', // Will be set after appointment creation
             patientId: patientId.toString(),
             patientPhone: appointment.phone_number,
-            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentDate: appointment.appointment_date,
             appointmentTime: appointment.appointment_time,
         });
 
@@ -172,7 +172,7 @@ export const addNewPatientAndAppointment = async ({ appointment }: { appointment
             appointmentId: appointmentResult.rows[0].id.toString(),
             patientId: patientId.toString(),
             patientPhone: appointment.phone_number,
-            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentDate: appointment.appointment_date,
             appointmentTime: appointment.appointment_time,
         });
 

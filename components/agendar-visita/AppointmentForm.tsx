@@ -322,7 +322,7 @@ const AppointmentForm = () => {
                 consult_type_id: +values.consult_type,
                 health_insurance: values.health_insurance,
                 practice_type_id: values.visit_type === "2" ? +values.practice_type : 0,
-                appointment_date: values.appointment_date,
+                appointment_date: values.appointment_date.toISOString().split('T')[0],
                 appointment_time: values.appointment_time,
             };
 
