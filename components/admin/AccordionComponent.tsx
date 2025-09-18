@@ -6,7 +6,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import DialogComponent from "./DialogComponent";
 import AccordionItemList from "./AccordionItemList";
-import { getAppointments } from "@/lib/actions";
+// import { getAppointments } from "@/lib/actions"; // Replaced with API route
 
 const AccordionComponent = () => {
     const [date, setDate] = useState<Date>(new Date());
@@ -20,9 +20,13 @@ const AccordionComponent = () => {
         queryKey: ["appointments", { date }],
         queryFn: async () => {
             const formatedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-            const data = await getAppointments(formatedDate);
-
-            return data ? data : [];
+            
+            const response = await fetch(`/api/appointments/date/${formatedDate}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch appointments');
+            }
+            const data = await response.json();
+            return data.appointments ? data.appointments : [];
         },
     });
 

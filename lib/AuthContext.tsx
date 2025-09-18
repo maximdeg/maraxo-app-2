@@ -41,46 +41,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = (userData: User, authToken: string) => {
         setUser(userData);
         setToken(authToken);
-        sessionStorage.setItem('adminToken', authToken);
-        sessionStorage.setItem('adminUser', JSON.stringify(userData));
+        // Note: Token is now stored in HTTP-only cookie, not in client storage
     };
 
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        sessionStorage.removeItem('adminToken');
-        sessionStorage.removeItem('adminUser');
-        toast.success('Logged out successfully');
+    const logout = async () => {
+        try {
+            // Call logout endpoint to clear server-side cookie
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            setUser(null);
+            setToken(null);
+            toast.success('Logged out successfully');
+        }
     };
 
     const checkAuth = async (): Promise<boolean> => {
-        const storedToken = sessionStorage.getItem('adminToken');
-        const storedUser = sessionStorage.getItem('adminUser');
-
-        if (!storedToken || !storedUser) {
-            setIsLoading(false);
-            return false;
-        }
-
         try {
+            // Check authentication using the verify endpoint
+            // The token will be automatically sent via HTTP-only cookie
             const response = await fetch('/api/auth/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: storedToken }),
+                credentials: 'include', // Include cookies
+                body: JSON.stringify({}), // Empty body since token is in cookie
             });
 
             if (response.ok) {
                 const result = await response.json();
                 setUser(result.user);
-                setToken(storedToken);
+                setToken('authenticated'); // Placeholder since we don't store token client-side
                 setIsLoading(false);
                 return true;
             } else {
-                // Token is invalid, clear storage
-                sessionStorage.removeItem('adminToken');
-                sessionStorage.removeItem('adminUser');
+                // Token is invalid or expired
                 setUser(null);
                 setToken(null);
                 setIsLoading(false);
@@ -88,8 +85,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         } catch (error) {
             console.error('Auth check error:', error);
-            sessionStorage.removeItem('adminToken');
-            sessionStorage.removeItem('adminUser');
             setUser(null);
             setToken(null);
             setIsLoading(false);

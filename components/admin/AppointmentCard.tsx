@@ -2,7 +2,7 @@ import React from "react";
 import { AppointmentInfo } from "@/lib/types";
 import { Button } from "../ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cancelAppointment } from "@/lib/actions";
+// import { cancelAppointment } from "@/lib/actions"; // Replaced with API route
 import { toast } from "sonner";
 import {
     AlertDialog,
@@ -23,7 +23,19 @@ const AppointmentCard = ({ appointment }: { appointment: AppointmentInfo }) => {
 
     const { mutateAsync: cancelAppointmentMutation, isPending } = useMutation({
         mutationFn: async (variables: { appointment: AppointmentInfo }) => {
-            return cancelAppointment(appointment.id);
+            const response = await fetch(`/api/appointments/${appointment.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to cancel appointment');
+            }
+
+            return response.json();
         },
         onMutate: async () => {
             // Cancel any outgoing refetches for all appointment queries

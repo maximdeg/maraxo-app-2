@@ -18,30 +18,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         const checkSession = async () => {
             if (!isLoading) {
                 if (!user) {
-                    // Check if there are saved credentials and try auto-login
-                    const savedCredentials = localStorage.getItem('adminCredentials');
-                    if (savedCredentials) {
-                        try {
-                            const { email, password, rememberMe } = JSON.parse(savedCredentials);
-                            if (rememberMe) {
-                                const response = await fetch('/api/auth/login', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ email, password }),
-                                });
-
-                                if (response.ok) {
-                                    const result = await response.json();
-                                    login(result.user, result.token);
-                                    return;
-                                }
-                            }
-                        } catch (error) {
-                            console.error('Auto-login error:', error);
-                        }
-                    }
+                    // No auto-login with saved credentials for security
+                    // User must manually log in each time
                     setShowLoginDialog(true);
                 }
                 setIsCheckingSession(false);

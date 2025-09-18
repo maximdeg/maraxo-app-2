@@ -11,6 +11,10 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
+        "test": "vitest",
+        "test:run": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:security": "node scripts/run-security-tests.js",
         "setup-admin": "node scripts/setup-admin.js",
         "generate-secret": "node scripts/generate-jwt-secret.js"
     },
@@ -75,6 +79,8 @@
         "@types/webpack": "5.28.5",
         "@types/webpack-sources": "3.2.3",
         "@types/yargs": "17.0.33",
-        "@types/yargs-parser": "21.0.3"
+        "@types/yargs-parser": "21.0.3",
+        "@vitest/coverage-v8": "^1.6.1",
+        "vitest": "^1.6.1"
     }
 }

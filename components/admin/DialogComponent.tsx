@@ -1,6 +1,6 @@
 import React, { memo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { addUnavailableDay, getUnavailableDay, addUnavailableTime } from "@/lib/actions";
+// import { addUnavailableDay, getUnavailableDay, addUnavailableTime } from "@/lib/actions"; // Replaced with API routes
 
 import SelectTimeComponent from "./SelectTimeComponent";
 import {
@@ -36,7 +36,12 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
         queryKey: ["unavailableDate", { selectedDate }],
         queryFn: async () => {
             const formatedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
-            const data = await getUnavailableDay(formatedDate);
+            
+            const response = await fetch(`/api/unavailable-days?date=${formatedDate}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch unavailable day');
+            }
+            const data = await response.json();
 
             setIsDayOff(data?.is_confirmed);
             setFirstDayOffState(data?.is_confirmed);
@@ -46,7 +51,23 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
 
     const { mutateAsync: addUnavailableDayMutation } = useMutation({
         mutationFn: async (variables: { selectedDate: Date; isDayOff: boolean }) => {
-            return addUnavailableDay(variables.selectedDate, variables.isDayOff);
+            const response = await fetch('/api/unavailable-days', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    selectedDate: variables.selectedDate,
+                    isDayOff: variables.isDayOff
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update unavailable day');
+            }
+
+            return response.json();
         },
         onMutate: () => {
             // Handle Mutation?
@@ -75,7 +96,24 @@ const DialogComponent = memo(({ selectedDate }: { selectedDate: Date }) => {
 
     const { mutateAsync: addUnavailableTimeMutation } = useMutation({
         mutationFn: async (variables: { selectedDate: Date; start_time: string; end_time: string }) => {
-            return addUnavailableTime(variables.selectedDate, variables.start_time, variables.end_time);
+            const response = await fetch('/api/unavailable-times', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    selectedDate: variables.selectedDate,
+                    start_time: variables.start_time,
+                    end_time: variables.end_time
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to add unavailable time');
+            }
+
+            return response.json();
         },
         onMutate: () => {
             // Handle Mutation?

@@ -4,8 +4,16 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { query } from './db';
 
-// JWT Secret - should be in environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+// JWT Secret - must be provided via environment variables
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+if (JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be at least 32 characters long');
+}
 
 // Email configuration
 const transporter = nodemailer.createTransport({

@@ -1,65 +1,79 @@
-import { NextResponse, NextRequest } from "next/server";
-import { query } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import { query } from '@/lib/db';
 
-export async function GET() {
+export async function POST(request: NextRequest) {
     try {
-        const unavailableDays = await query(`
-            SELECT ud.unavailable_date, ud.is_confirmed, ws.day_of_week as day
-            FROM unavailable_days ud
-            JOIN work_schedule ws ON ud.work_schedule_id = ws.id
-            ORDER BY ud.unavailable_date
-        `);
-        return NextResponse.json({ 
-            unavailableDays: unavailableDays.rows,
-            count: unavailableDays.rows.length
-        }, { status: 200 });
+        const { selectedDate, isDayOff } = await request.json();
+
+        if (!selectedDate) {
+            return NextResponse.json(
+                { error: "Date is required" },
+                { status: 400 }
+            );
+        }
+
+        const formatedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+
+        // Check if record already exists
+        const existingRecord = await query(
+            "SELECT id FROM unavailable_days WHERE date = $1",
+            [formatedDate]
+        );
+
+        if (existingRecord.rows.length > 0) {
+            // Update existing record
+            await query(
+                "UPDATE unavailable_days SET is_confirmed = $1 WHERE date = $2",
+                [isDayOff, formatedDate]
+            );
+        } else {
+            // Insert new record
+            await query(
+                "INSERT INTO unavailable_days (date, is_confirmed) VALUES ($1, $2)",
+                [formatedDate, isDayOff]
+            );
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: isDayOff ? "Day marked as unavailable" : "Day marked as available"
+        });
+
     } catch (error) {
-        console.error("Database query error:", error);
-        return NextResponse.json({ error: "Failed to fetch unavailable days" }, { status: 500 });
+        console.error('Error updating unavailable day:', error);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
     }
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
     try {
-        const body = await req.json();
-        const { unavailable_date, is_confirmed } = body;
+        const { searchParams } = new URL(request.url);
+        const date = searchParams.get('date');
 
-        if (!unavailable_date) {
-            return NextResponse.json({ error: "Missing required field: unavailable_date" }, { status: 400 });
-        }
-
-        // Validate date format
-        if (isNaN(Date.parse(unavailable_date))) {
-            return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
-        }
-
-        const work_schedule_id: number = new Date(unavailable_date).getDay() + 1;
-
-        // Check if the day is already marked as unavailable
-        const existingDay = await query(
-            "SELECT id FROM unavailable_days WHERE unavailable_date = $1",
-            [unavailable_date]
-        );
-
-        if (existingDay.rows.length > 0) {
-            return NextResponse.json({ 
-                error: "Day is already marked as unavailable",
-                existingId: existingDay.rows[0].id
-            }, { status: 409 });
+        if (!date) {
+            return NextResponse.json(
+                { error: "Date parameter is required" },
+                { status: 400 }
+            );
         }
 
         const result = await query(
-            `INSERT INTO unavailable_days (work_schedule_id, unavailable_date, is_confirmed)
-            VALUES ($1, $2, $3) RETURNING id, unavailable_date, is_confirmed`,
-            [work_schedule_id, unavailable_date, is_confirmed || false]
+            "SELECT * FROM unavailable_days WHERE date = $1",
+            [date]
         );
-        
-        return NextResponse.json({ 
-            message: "Unavailable day created successfully", 
-            unavailableDay: result.rows[0]
-        }, { status: 201 });
+
+        const data = result.rows[0] || { is_confirmed: false };
+
+        return NextResponse.json(data);
+
     } catch (error) {
-        console.error("Database query error:", error);
-        return NextResponse.json({ error: "Failed to create unavailable day" }, { status: 500 });
+        console.error('Error fetching unavailable day:', error);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
     }
 }

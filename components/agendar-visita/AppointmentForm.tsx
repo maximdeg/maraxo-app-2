@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +18,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { addNewPatientAndAppointment } from "@/lib/actions";
+// import { addNewPatientAndAppointment } from "@/lib/actions"; // Replaced with API route
 import { NewAppointmentInfo } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -116,7 +116,7 @@ const disabledDays = (day: Date) => {
 const AppointmentForm = () => {
     const router = useRouter();
     const [date, setDate] = useState();
-    const [userSelectedDate, setUserSelectedDate] = useState<Date>();
+    const [userSelectedDate, setUserSelectedDate] = useState<Date>(new Date());
     const [selectedOption, setSelectedOption] = useState<string>("");
 
     const today = new Date();
@@ -153,6 +153,14 @@ const AppointmentForm = () => {
             appointment_time: "",
         },
     });
+
+    // Sync userSelectedDate with form's appointment_date
+    useEffect(() => {
+        const formDate = form.getValues('appointment_date');
+        if (formDate && formDate !== userSelectedDate) {
+            setUserSelectedDate(formDate);
+        }
+    }, [form, userSelectedDate]);
 
     const selectTimesComponent = useMemo(() => {
         return <AvailableTimesComponent selectedDate={userSelectedDate as Date} form={form} />;
@@ -227,12 +235,11 @@ const AppointmentForm = () => {
     };
 
     const handleDateChange = (value: Date) => {
-        console.log(value);
         setUserSelectedDate(() => value);
     };
 
     const clearForm = () => {
-        setUserSelectedDate(undefined);
+        setUserSelectedDate(new Date());
         setSelectedOption("");
         setDate(undefined);
         form.reset();
@@ -266,7 +273,20 @@ const AppointmentForm = () => {
 
     const { mutateAsync: addNewPatientAndAppointmentMutation, isPending } = useMutation({
         mutationFn: async (variables: { appointment: NewAppointmentInfo }) => {
-            return addNewPatientAndAppointment(variables);
+            const response = await fetch('/api/appointments/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(variables.appointment),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create appointment');
+            }
+
+            return response.json();
         },
         onMutate: () => {
             toast.loading("Agendando su cita...", {
@@ -471,7 +491,9 @@ const AppointmentForm = () => {
                                             mode="single"
                                             selected={field.value}
                                             onSelect={(selectedDate) => {
-                                                handleDateChange(selectedDate as Date);
+                                                if (selectedDate) {
+                                                    handleDateChange(selectedDate as Date);
+                                                }
                                                 return field.onChange(selectedDate);
                                             }}
                                             disabled={disabledDays}

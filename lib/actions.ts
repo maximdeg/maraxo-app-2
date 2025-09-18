@@ -238,6 +238,8 @@ export const getAvailableTimesByDate = async (date: string) => {
             [date]
         );
 
+        console.log(workday_date.rows);
+
         if (workday_date.rows.length > 0) {
             if (workday_date.rows[0].is_working_day === false || workday_date.rows[0].is_confirmed === true) {
                 throw new Error("This day is unavailable");
@@ -262,6 +264,7 @@ export const getAvailableTimesByDate = async (date: string) => {
             [dayName]
         );
 
+        console.log(availableSlots.rows);
         return {
             availableSlots: availableSlots.rows,
             date: date,

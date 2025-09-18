@@ -3,17 +3,18 @@ import { verifyToken, getUserById } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
     try {
-        const { token } = await request.json();
+        // Get token from HTTP-only cookie
+        const token = request.cookies.get('auth-token')?.value;
 
         if (!token) {
             return NextResponse.json(
-                { error: 'Token is required' },
-                { status: 400 }
+                { error: 'No authentication token found' },
+                { status: 401 }
             );
         }
 
         const decoded = verifyToken(token);
-
+        
         if (!decoded) {
             return NextResponse.json(
                 { error: 'Invalid or expired token' },
@@ -21,12 +22,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Get fresh user data from database
         const user = await getUserById(decoded.id);
-
+        
         if (!user) {
             return NextResponse.json(
                 { error: 'User not found' },
-                { status: 401 }
+                { status: 404 }
             );
         }
 
@@ -47,4 +49,4 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
-} 
+}

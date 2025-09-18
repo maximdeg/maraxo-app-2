@@ -59,19 +59,11 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ isOpen, onClose, onLoginSucce
 
     useEffect(() => {
         if (isOpen) {
-            // Check for saved credentials
-            const savedCredentials = localStorage.getItem('adminCredentials');
-            if (savedCredentials) {
-                try {
-                    const { email, password, rememberMe: savedRememberMe } = JSON.parse(savedCredentials);
-                    if (savedRememberMe) {
-                        loginForm.setValue('email', email);
-                        loginForm.setValue('password', password);
-                        setRememberMe(true);
-                    }
-                } catch (error) {
-                    console.error('Error parsing saved credentials:', error);
-                }
+            // Check for saved email only (never save password)
+            const savedEmail = localStorage.getItem('adminEmail');
+            if (savedEmail) {
+                loginForm.setValue('email', savedEmail);
+                setRememberMe(true);
             }
         }
     }, [isOpen]);
@@ -100,23 +92,15 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ isOpen, onClose, onLoginSucce
             const result = await response.json();
 
             if (response.ok) {
-                // Save credentials if remember me is checked
+                // Save email only if remember me is checked (never save password)
                 if (rememberMe) {
-                    localStorage.setItem('adminCredentials', JSON.stringify({
-                        email: data.email,
-                        password: data.password,
-                        rememberMe: true
-                    }));
+                    localStorage.setItem('adminEmail', data.email);
                 } else {
-                    localStorage.removeItem('adminCredentials');
+                    localStorage.removeItem('adminEmail');
                 }
 
-                // Save session data
-                sessionStorage.setItem('adminToken', result.token);
-                sessionStorage.setItem('adminUser', JSON.stringify(result.user));
-
                 toast.success('Login successful!');
-                onLoginSuccess(result.user, result.token);
+                onLoginSuccess(result.user, 'authenticated');
                 onClose();
             } else {
                 toast.error(result.error || 'Login failed');
