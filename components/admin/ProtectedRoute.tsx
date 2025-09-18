@@ -32,6 +32,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const handleLoginSuccess = (userData: any, token: string) => {
         login(userData, token);
         setShowLoginDialog(false);
+        // Redirect to admin page after successful login
+        window.location.href = '/admin';
     };
 
     if (isLoading || isCheckingSession) {
