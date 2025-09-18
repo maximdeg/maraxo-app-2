@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Check, ArrowLeft, Home as HomeIcon, Calendar, MapPin, Phone, AlertTriangle, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -35,17 +35,7 @@ const CancellationPage = () => {
 
     const token = searchParams.get("token");
 
-    useEffect(() => {
-        if (!token) {
-            setError("Token de cancelación no encontrado");
-            setLoading(false);
-            return;
-        }
-
-        fetchAppointmentData();
-    }, [token]);
-
-    const fetchAppointmentData = async () => {
+    const fetchAppointmentData = useCallback(async () => {
         try {
             const response = await fetch(`/api/cancel-appointment/verify?token=${encodeURIComponent(token!)}`);
             const data = await response.json();
@@ -64,7 +54,17 @@ const CancellationPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        if (!token) {
+            setError("Token de cancelación no encontrado");
+            setLoading(false);
+            return;
+        }
+
+        fetchAppointmentData();
+    }, [token, fetchAppointmentData]);
 
     const handleCancelAppointment = async () => {
         if (!token) return;

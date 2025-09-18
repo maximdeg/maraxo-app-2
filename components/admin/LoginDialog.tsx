@@ -66,7 +66,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ isOpen, onClose, onLoginSucce
                 setRememberMe(true);
             }
         }
-    }, [isOpen]);
+    }, [isOpen, loginForm]);
 
     useEffect(() => {
         // Get reset token from URL if present

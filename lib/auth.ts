@@ -5,18 +5,19 @@ import nodemailer from 'nodemailer';
 import { query } from './db';
 
 // JWT Secret - must be provided via environment variables
-const JWT_SECRET = process.env.JWT_SECRET;
+function getJWTSecret(): string {
+  const JWT_SECRET = process.env.JWT_SECRET;
+  
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
 
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
+  if (JWT_SECRET.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters long');
+  }
+  
+  return JWT_SECRET;
 }
-
-if (JWT_SECRET.length < 32) {
-  throw new Error('JWT_SECRET must be at least 32 characters long');
-}
-
-// Type assertion to tell TypeScript that JWT_SECRET is defined
-const JWT_SECRET_SAFE = JWT_SECRET as string;
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -63,7 +64,7 @@ export function generateToken(user: User): string {
             role: user.role,
             full_name: user.full_name 
         },
-        JWT_SECRET_SAFE,
+        getJWTSecret(),
         { expiresIn: '24h' }
     );
 }
@@ -71,7 +72,7 @@ export function generateToken(user: User): string {
 // JWT token verification
 export function verifyToken(token: string): any {
     try {
-        return jwt.verify(token, JWT_SECRET_SAFE);
+        return jwt.verify(token, getJWTSecret());
     } catch (error) {
         return null;
     }
