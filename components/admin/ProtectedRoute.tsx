@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import LoginDialog from './LoginDialog';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -13,6 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { user, isLoading, login, checkAuth } = useAuth();
     const [showLoginDialog, setShowLoginDialog] = useState(false);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const checkSession = async () => {
@@ -29,11 +31,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         checkSession();
     }, [isLoading, user, login]);
 
-    const handleLoginSuccess = (userData: any, token: string) => {
+    const handleLoginSuccess = async (userData: any, token: string) => {
         login(userData, token);
         setShowLoginDialog(false);
-        // Redirect to admin page after successful login
-        window.location.href = '/admin';
+        setIsCheckingSession(false); // Stop checking session since we have a user
+        
+        // No need to redirect since we're already on the admin page
+        // The component will re-render and show the admin content
     };
 
     if (isLoading || isCheckingSession) {

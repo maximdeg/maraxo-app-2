@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Calendar, Clock, MapPin, Phone, Star, ArrowRight, Shield, Users, Award } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Star, ArrowRight, Shield, Users, Award, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterRoot from "@/components/agendar-visita/FooterRoot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -333,6 +333,43 @@ export default function Home() {
                 </section>
 
                 <FooterRoot />
+                
+                {/* Simple Floating Install Button */}
+                <motion.div
+                    className="fixed bottom-6 right-6 z-50"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 2, duration: 0.5 }}
+                >
+                    <Button
+                        className="bg-gradient-to-r from-[#ba8c84] to-[#9e7162] hover:from-[#9e7162] hover:to-[#ba8c84] text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300"
+                        onClick={() => {
+                            // Simple PWA install logic
+                            if ('serviceWorker' in navigator) {
+                                // Check if app can be installed
+                                const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                                const isIOSStandalone = (window.navigator as any).standalone === true;
+                                
+                                if (!isStandalone && !isIOSStandalone) {
+                                    // Show browser's native install prompt
+                                    if ('beforeinstallprompt' in window) {
+                                        // This will trigger the browser's install prompt
+                                        window.dispatchEvent(new Event('beforeinstallprompt'));
+                                    } else {
+                                        // Fallback for browsers that don't support beforeinstallprompt
+                                        alert('Para instalar la app, usa el menú de tu navegador y selecciona "Agregar a pantalla de inicio" o "Instalar app".');
+                                    }
+                                } else {
+                                    alert('La app ya está instalada.');
+                                }
+                            } else {
+                                alert('Tu navegador no soporta la instalación de apps.');
+                            }
+                        }}
+                    >
+                        <Download className="w-6 h-6" />
+                    </Button>
+                </motion.div>
             </div>
         </QueryClientProvider>
     );

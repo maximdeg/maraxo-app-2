@@ -3,9 +3,11 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import LoginDialog from "@/components/admin/LoginDialog";
+import { useRouter } from "next/navigation";
 
 const FooterRoot = () => {
     const [showLoginDialog, setShowLoginDialog] = useState(false);
+    const router = useRouter();
 
     const handleAdminClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -14,7 +16,7 @@ const FooterRoot = () => {
 
     const handleLoginSuccess = (userData: any, token: string) => {
         // Redirect to admin page after successful login
-        window.location.href = '/admin';
+        router.push('/admin');
     };
 
     return (

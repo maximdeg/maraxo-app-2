@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
 
         // Check if record already exists
         const existingRecord = await query(
-            "SELECT id FROM unavailable_times WHERE date = $1 AND start_time = $2 AND end_time = $3",
+            "SELECT id FROM unavailable_time_frames WHERE workday_date = $1 AND start_time = $2 AND end_time = $3",
             [formatedDate, start_time, end_time]
         );
 
         if (existingRecord.rows.length === 0) {
             // Insert new record
             await query(
-                "INSERT INTO unavailable_times (date, start_time, end_time) VALUES ($1, $2, $3)",
+                "INSERT INTO unavailable_time_frames (workday_date, start_time, end_time) VALUES ($1, $2, $3)",
                 [formatedDate, start_time, end_time]
             );
         }
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         }
 
         const result = await query(
-            "SELECT * FROM unavailable_times WHERE date = $1",
+            "SELECT * FROM unavailable_time_frames WHERE workday_date = $1",
             [date]
         );
 

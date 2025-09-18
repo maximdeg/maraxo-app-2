@@ -5,18 +5,19 @@ import { verifyToken } from '@/lib/auth-edge'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Protect admin routes
+  // Protect admin routes - but allow /admin to load for authentication
   if (pathname.startsWith('/admin')) {
     const token = request.cookies.get('auth-token')?.value
     
+    // If no token, let the page load and let ProtectedRoute handle authentication
     if (!token) {
-      return NextResponse.redirect(new URL('/admin', request.url))
+      return NextResponse.next()
     }
 
     const decoded = verifyToken(token)
     if (!decoded) {
-      // Clear invalid token
-      const response = NextResponse.redirect(new URL('/admin', request.url))
+      // Clear invalid token but still allow page to load
+      const response = NextResponse.next()
       response.cookies.delete('auth-token')
       return response
     }
@@ -56,8 +57,9 @@ export function middleware(request: NextRequest) {
 
   // Protect sensitive API routes (appointments, patients)
   if (pathname.startsWith('/api/appointments') || pathname.startsWith('/api/patients')) {
-    // Allow GET requests for public data, but protect POST/PUT/DELETE
-    if (request.method !== 'GET') {
+    // Allow GET requests and appointment creation for public access
+    // Only protect admin operations like updating/deleting appointments
+    if (request.method === 'PUT' || request.method === 'DELETE') {
       const token = request.headers.get('authorization')?.replace('Bearer ', '')
       
       if (!token) {
@@ -75,6 +77,7 @@ export function middleware(request: NextRequest) {
         )
       }
     }
+    // Allow GET and POST requests for public access (appointment scheduling)
   }
 
   return NextResponse.next()

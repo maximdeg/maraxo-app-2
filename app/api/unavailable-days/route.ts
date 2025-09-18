@@ -19,20 +19,20 @@ export async function POST(request: NextRequest) {
 
         // Check if record already exists
         const existingRecord = await query(
-            "SELECT id FROM unavailable_days WHERE date = $1",
+            "SELECT id FROM unavailable_days WHERE unavailable_date = $1",
             [formatedDate]
         );
 
         if (existingRecord.rows.length > 0) {
             // Update existing record
             await query(
-                "UPDATE unavailable_days SET is_confirmed = $1 WHERE date = $2",
+                "UPDATE unavailable_days SET is_confirmed = $1 WHERE unavailable_date = $2",
                 [isDayOff, formatedDate]
             );
         } else {
             // Insert new record
             await query(
-                "INSERT INTO unavailable_days (date, is_confirmed) VALUES ($1, $2)",
+                "INSERT INTO unavailable_days (unavailable_date, is_confirmed) VALUES ($1, $2)",
                 [formatedDate, isDayOff]
             );
         }
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         }
 
         const result = await query(
-            "SELECT * FROM unavailable_days WHERE date = $1",
+            "SELECT * FROM unavailable_days WHERE unavailable_date = $1",
             [date]
         );
 
