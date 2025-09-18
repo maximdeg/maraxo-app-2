@@ -24,6 +24,6 @@ export interface NewAppointmentInfo {
     consult_type_id: number;
     health_insurance: string;
     practice_type_id: number;
-    appointment_date: Date;
+    appointment_date: string;
     appointment_time: string;
 }

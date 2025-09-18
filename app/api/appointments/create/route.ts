@@ -63,11 +63,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate cancellation token
+        const appointmentDate = new Date(appointment.appointment_date);
         const cancellationToken = generateCancellationToken({
             appointmentId: '', // Will be set after appointment creation
             patientId: patientId.toString(),
             patientPhone: appointment.phone_number,
-            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentDate: appointmentDate.toISOString().split('T')[0],
             appointmentTime: appointment.appointment_time
         });
 
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
             appointmentId: newAppointment.id.toString(),
             patientId: patientId.toString(),
             patientPhone: appointment.phone_number,
-            appointmentDate: appointment.appointment_date.toISOString().split('T')[0],
+            appointmentDate: appointmentDate.toISOString().split('T')[0],
             appointmentTime: appointment.appointment_time
         });
 
