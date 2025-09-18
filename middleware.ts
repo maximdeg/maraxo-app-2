@@ -10,13 +10,13 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get('auth-token')?.value
     
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/admin', request.url))
     }
 
     const decoded = verifyToken(token)
     if (!decoded) {
       // Clear invalid token
-      const response = NextResponse.redirect(new URL('/login', request.url))
+      const response = NextResponse.redirect(new URL('/admin', request.url))
       response.cookies.delete('auth-token')
       return response
     }

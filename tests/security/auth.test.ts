@@ -196,7 +196,7 @@ describe('Authentication Security Tests', () => {
       
       expect(mockRedirect).toHaveBeenCalledWith(
         expect.objectContaining({
-          pathname: '/login'
+          pathname: '/admin'
         })
       )
     })

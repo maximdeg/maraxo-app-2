@@ -212,7 +212,7 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const token = request.cookies.get('auth-token')
     if (!token || !verifyToken(token.value)) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/admin', request.url))
     }
   }
   
