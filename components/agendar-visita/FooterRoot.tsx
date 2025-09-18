@@ -11,6 +11,7 @@ const FooterRoot = () => {
 
     const handleAdminClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        // Always show login dialog since we can't check auth state here
         setShowLoginDialog(true);
     };
 

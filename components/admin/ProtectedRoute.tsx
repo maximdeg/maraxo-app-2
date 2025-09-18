@@ -20,16 +20,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         const checkSession = async () => {
             if (!isLoading) {
                 if (!user) {
-                    // No auto-login with saved credentials for security
-                    // User must manually log in each time
-                    setShowLoginDialog(true);
+                    // Check if user is already authenticated via cookie
+                    const isAuthenticated = await checkAuth();
+                    if (!isAuthenticated) {
+                        setShowLoginDialog(true);
+                    }
                 }
                 setIsCheckingSession(false);
             }
         };
 
         checkSession();
-    }, [isLoading, user, login]);
+    }, [isLoading, user, checkAuth]);
 
     const handleLoginSuccess = async (userData: any, token: string) => {
         login(userData, token);
@@ -39,6 +41,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         // No need to redirect since we're already on the admin page
         // The component will re-render and show the admin content
     };
+
+    // Check if user is already authenticated when component mounts
+    useEffect(() => {
+        if (user) {
+            setIsCheckingSession(false);
+        }
+    }, [user]);
 
     if (isLoading || isCheckingSession) {
         return (
