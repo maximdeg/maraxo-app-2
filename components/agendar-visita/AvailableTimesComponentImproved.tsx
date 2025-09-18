@@ -42,7 +42,7 @@ const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponent
         for (let i = 0; i <= totalMinutes - intervalMinutes; i += intervalMinutes) {
             const hour = startHour + Math.floor(i / 60);
             const minutes = (i % 60).toString().padStart(2, "0");
-            const time = `${hour}:${minutes}`;
+            const time = `${hour.toString().padStart(2, "0")}:${minutes}`;
             if (!appointmentTimes.includes(time)) {
                 newTimes.push(time);
             }
@@ -74,15 +74,15 @@ const AvailableTimesComponent = ({ selectedDate, form }: AvailableTimesComponent
             try {
                 const data = await getAvailableTimesByDate(formatedDate);
 
-                // Check if availableSlots is an array and has at least one item
-                if (!data.availableSlots || !Array.isArray(data.availableSlots) || data.availableSlots.length === 0) {
+                // Check if availableSlots exists
+                if (!data.availableSlots) {
                     setTimes([]);
                     setIsGeneratingTimes(false);
                     return data;
                 }
 
-                // Use the first available slot for time generation
-                const firstSlot = data.availableSlots[0];
+                // Handle both array and object formats
+                const firstSlot = Array.isArray(data.availableSlots) ? data.availableSlots[0] : data.availableSlots;
                 
                 if (!firstSlot.start_time || !firstSlot.end_time) {
                     setTimes([]);
