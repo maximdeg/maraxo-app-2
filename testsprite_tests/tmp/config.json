@@ -10,10 +10,10 @@
     "projectName": "maraxo-app-2-main",
     "projectPath": "C:\\Users\\Maxim\\work\\Maraxo app\\maraxo-app-2-main",
     "testIds": [],
-    "additionalInstruction": "",
+    "additionalInstruction": "Re-running backend tests after code fixes. The following fixes have been applied: 1) API response formats fixed (visit types and consult types return arrays, patient returns fields at root level), 2) Field name flexibility (accepts both camelCase and snake_case), 3) Middleware enhanced to check cookies for admin API routes, 4) Error messages improved. Please test all endpoints again and verify if the fixes resolved the issues. Note: Database seeding may still be needed for some tests.",
     "envs": {
       "API_KEY": "sk-user-ad-jY1xujUMdwvPG1bBtHYQvIhFjghrOQ3bP7RRERlyJ0AkAYhyNmlw6GS1S33_uWlyugEeICiltFa_b95z5ut7MgSaKSVx3TbCqSsSddikKrB7AmO69usOZcVXioTC_bjc"
     }
   },
-  "proxy": "http://c89b0f6d-af74-46d9-988b-901462f5b24e:qQu4muIPSLtqbXpcXbN3oLKypR5rFEvE@tun.testsprite.com:8080"
+  "proxy": "http://43699c84-f973-4cde-b35a-c055ee47a408:990igwNabhckvfhdIdgmSG6rU64tGhod@tun.testsprite.com:8080"
 }

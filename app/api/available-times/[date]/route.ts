@@ -37,13 +37,47 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                     reason: workday_date.rows[0].is_working_day === false ? "Not a working day" : "Day marked as unavailable"
                 }, { status: 404 });
             } else {
-                return NextResponse.json({
-                    availableSlots: workday_date.rows,
-                    date: date,
-                    type: "custom_schedule"
-                }, { status: 200 });
+                // Generate time slots for custom schedule
+                const generateTimeSlots = (startTime: string, endTime: string, bookedTimes: string[]): string[] => {
+                    const [startHour, startMin] = startTime.split(':').map(Number);
+                    const [endHour, endMin] = endTime.split(':').map(Number);
+                    
+                    const startTotalMinutes = startHour * 60 + startMin;
+                    const endTotalMinutes = endHour * 60 + endMin;
+                    const intervalMinutes = 20;
+                    
+                    const slots: string[] = [];
+                    for (let minutes = startTotalMinutes; minutes <= endTotalMinutes - intervalMinutes; minutes += intervalMinutes) {
+                        const hour = Math.floor(minutes / 60);
+                        const min = minutes % 60;
+                        const timeSlot = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                        
+                        if (!bookedTimes.includes(timeSlot)) {
+                            slots.push(timeSlot);
+                        }
+                    }
+                    return slots;
+                };
+
+                // Get booked appointments for this date
+                const appointmentTimesByDate = await query(
+                    `SELECT appointment_time FROM appointments 
+                     WHERE appointment_date = $1 AND status != 'cancelled'`,
+                    [date]
+                );
+                const bookedTimes = appointmentTimesByDate.rows.map((item: any) => item.appointment_time);
+
+                const customSlot = workday_date.rows[0];
+                const times = generateTimeSlots(customSlot.start_time, customSlot.end_time, bookedTimes);
+
+                // Return list directly for API consistency
+                return NextResponse.json(times, { status: 200 });
             }
         }
+
+        // Convert day number to day name (matching database schema)
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayName = dayNames[weekDay];
 
         // Get default available slots for the day of week
         const availableSlots = await query(
@@ -53,8 +87,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 ws.is_working_day
             FROM available_slots 
             JOIN work_schedule ws ON available_slots.work_schedule_id = ws.id
-            WHERE work_schedule_id = $1`,
-            [weekDay]
+            WHERE ws.day_of_week = $1`,
+            [dayName]
         );
 
         if (availableSlots.rows.length < 1) {
@@ -77,12 +111,34 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
         const appointmentTimes = appointmentTimesByDate.rows.map((item: any) => item.appointment_time);
 
-        return NextResponse.json({ 
-            availableSlots: availableSlots.rows[0], 
-            appointmentTimes,
-            date: date,
-            type: "default_schedule"
-        }, { status: 200 });
+        // Generate time slots from start_time to end_time with 20-minute intervals
+        const generateTimeSlots = (startTime: string, endTime: string, bookedTimes: string[]): string[] => {
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+            
+            const startTotalMinutes = startHour * 60 + startMin;
+            const endTotalMinutes = endHour * 60 + endMin;
+            const intervalMinutes = 20;
+            
+            const slots: string[] = [];
+            for (let minutes = startTotalMinutes; minutes <= endTotalMinutes - intervalMinutes; minutes += intervalMinutes) {
+                const hour = Math.floor(minutes / 60);
+                const min = minutes % 60;
+                const timeSlot = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                
+                // Exclude booked times
+                if (!bookedTimes.includes(timeSlot)) {
+                    slots.push(timeSlot);
+                }
+            }
+            return slots;
+        };
+
+        const slot = availableSlots.rows[0];
+        const times = generateTimeSlots(slot.start_time, slot.end_time, appointmentTimes);
+
+        // Return list directly for API consistency
+        return NextResponse.json(times, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch available times" }, { status: 500 });

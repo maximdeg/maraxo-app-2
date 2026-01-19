@@ -8,9 +8,50 @@ export async function POST(request: NextRequest) {
   try {
     const { subscription, userAgent, timestamp } = await request.json();
 
-    if (!subscription || !subscription.endpoint) {
+    // Validate subscription object structure
+    if (!subscription) {
       return NextResponse.json(
-        { error: 'Invalid subscription data' },
+        { 
+          error: 'Invalid subscription data',
+          details: 'Subscription object is required',
+          required: ['subscription.endpoint', 'subscription.keys.p256dh', 'subscription.keys.auth']
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!subscription.endpoint) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid subscription data',
+          details: 'Subscription endpoint is required',
+          received: Object.keys(subscription),
+          required: ['endpoint', 'keys.p256dh', 'keys.auth']
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate keys structure
+    if (!subscription.keys) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid subscription data',
+          details: 'Subscription keys object is required',
+          required: ['keys.p256dh', 'keys.auth']
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!subscription.keys.p256dh || !subscription.keys.auth) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid subscription data',
+          details: 'Both p256dh and auth keys are required',
+          received: subscription.keys ? Object.keys(subscription.keys) : [],
+          required: ['p256dh', 'auth']
+        },
         { status: 400 }
       );
     }

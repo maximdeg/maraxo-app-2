@@ -25,7 +25,15 @@ export async function POST(request: NextRequest) {
             }
         } else {
             return NextResponse.json(
-                { error: "Date is required (provide 'unavailable_date' or 'selectedDate')" },
+                { 
+                    error: "Date is required",
+                    details: "Provide either 'unavailable_date' (YYYY-MM-DD string) or 'selectedDate' (Date object or string)",
+                    received: Object.keys(body),
+                    acceptedFormats: {
+                        unavailable_date: "YYYY-MM-DD string (e.g., '2024-01-15')",
+                        selectedDate: "Date object or YYYY-MM-DD string"
+                    }
+                },
                 { status: 400 }
             );
         }
@@ -70,8 +78,12 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Error updating unavailable day:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
-            { error: "Internal server error" },
+            { 
+                error: "Internal server error",
+                details: errorMessage
+            },
             { status: 500 }
         );
     }

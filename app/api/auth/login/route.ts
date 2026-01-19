@@ -15,11 +15,14 @@ export async function POST(request: NextRequest) {
             return createRateLimitResponse(rateLimitResult.remaining, rateLimitResult.resetTime);
         }
 
-        const { email, password } = await request.json();
+        const body = await request.json();
+        // Accept both 'email' and 'username' fields for compatibility
+        const email = body.email || body.username;
+        const password = body.password;
 
         if (!email || !password) {
             return NextResponse.json(
-                { error: 'Email and password are required' },
+                { error: 'Email/username and password are required' },
                 { status: 400 }
             );
         }

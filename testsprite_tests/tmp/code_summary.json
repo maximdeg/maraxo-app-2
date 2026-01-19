@@ -44,7 +44,7 @@
     },
     {
       "name": "Authentication & Authorization",
-      "description": "Admin authentication system with JWT tokens, password reset, and protected routes",
+      "description": "Admin authentication system with JWT tokens, password reset, protected routes, and improved authentication flow that checks cached credentials before prompting for login",
       "files": [
         "app/api/auth/login/route.ts",
         "app/api/auth/logout/route.ts",
@@ -55,6 +55,7 @@
         "lib/auth-edge.ts",
         "components/admin/LoginDialog.tsx",
         "components/admin/ProtectedRoute.tsx",
+        "components/agendar-visita/FooterRoot.tsx",
         "lib/AuthContext.tsx",
         "middleware.ts"
       ]

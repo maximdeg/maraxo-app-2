@@ -7,12 +7,42 @@ import { useRouter } from "next/navigation";
 
 const FooterRoot = () => {
     const [showLoginDialog, setShowLoginDialog] = useState(false);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(false);
     const router = useRouter();
 
-    const handleAdminClick = (e: React.MouseEvent) => {
+    const checkAuthentication = async (): Promise<boolean> => {
+        try {
+            const response = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({}),
+            });
+
+            return response.ok;
+        } catch (error) {
+            console.error('Auth check error:', error);
+            return false;
+        }
+    };
+
+    const handleAdminClick = async (e: React.MouseEvent) => {
         e.preventDefault();
-        // Always show login dialog since we can't check auth state here
-        setShowLoginDialog(true);
+        setIsCheckingAuth(true);
+        
+        // Check if user is already authenticated
+        const isAuthenticated = await checkAuthentication();
+        setIsCheckingAuth(false);
+        
+        if (isAuthenticated) {
+            // User is already authenticated, redirect to admin
+            router.push('/admin');
+        } else {
+            // User is not authenticated, show login dialog
+            setShowLoginDialog(true);
+        }
     };
 
     const handleLoginSuccess = (userData: any, token: string) => {
@@ -30,9 +60,10 @@ const FooterRoot = () => {
                     <br />
                     <button
                         onClick={handleAdminClick}
-                        className=" hover:text-blue-800 mt-4"
+                        disabled={isCheckingAuth}
+                        className=" hover:text-blue-800 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Admin
+                        {isCheckingAuth ? 'Checking...' : 'Admin'}
                     </button>
                 </div>
             </footer>

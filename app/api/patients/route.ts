@@ -35,14 +35,22 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { first_name, last_name, phone_number } = body;
+        
+        // Accept both camelCase and snake_case field names
+        const first_name = body.first_name || body.firstName;
+        const last_name = body.last_name || body.lastName;
+        const phone_number = body.phone_number || body.phone || body.phoneNumber;
 
         // Validate required fields
         if (!first_name || !last_name || !phone_number) {
             return NextResponse.json({ 
                 error: "Missing required fields",
                 required: ["first_name", "last_name", "phone_number"],
-                received: Object.keys(body)
+                received: Object.keys(body),
+                acceptedFormats: {
+                    snake_case: ["first_name", "last_name", "phone_number"],
+                    camelCase: ["firstName", "lastName", "phone", "phoneNumber"]
+                }
             }, { status: 400 });
         }
 
@@ -67,9 +75,30 @@ export async function POST(req: NextRequest) {
             [first_name, last_name, phone_number]
         );
         
+        const patient = result.rows[0];
+        
         return NextResponse.json({ 
             message: "Patient created successfully", 
-            patient: result.rows[0]
+            id: patient.id,
+            // snake_case fields
+            first_name: patient.first_name,
+            last_name: patient.last_name,
+            phone_number: patient.phone_number,
+            // camelCase fields for compatibility
+            firstName: patient.first_name,
+            lastName: patient.last_name,
+            phone: patient.phone_number,
+            phoneNumber: patient.phone_number,
+            patient: {
+                id: patient.id,
+                first_name: patient.first_name,
+                last_name: patient.last_name,
+                phone_number: patient.phone_number,
+                firstName: patient.first_name,
+                lastName: patient.last_name,
+                phone: patient.phone_number,
+                phoneNumber: patient.phone_number
+            }
         }, { status: 201 });
     } catch (error) {
         if (

@@ -1,59 +1,52 @@
 {
   "meta": {
-    "project": "Maraxo App - Medical Appointment Scheduling System",
+    "project": "Maraxo Medical Appointment Scheduling System",
     "date": "2026-01-15",
     "prepared_by": "Software Development Manager"
   },
-  "product_overview": "Maraxo App is a progressive web application designed to streamline medical appointment scheduling for Dra. Mara Flamini's dermatology practice. It offers patients an intuitive interface to book, confirm, and cancel appointments securely while providing an administrative dashboard for managing schedules and appointments efficiently. Built with modern technologies like Next.js 15, React 18, and PostgreSQL, it ensures robust performance, security, and scalability.",
+  "product_overview": "Maraxo is a comprehensive Progressive Web Application (PWA) designed for Dra. Mara Flamini's dermatology practice. It facilitates seamless online appointment scheduling, management, and cancellation for patients while providing a secure and powerful administrative backend to manage schedules and appointments effectively.",
   "core_goals": [
-    "Enable patients to easily schedule medical appointments with detailed options such as visit type, consult type, practice type, and health insurance selection.",
-    "Provide secure, token-based appointment cancellation with enforced policies to prevent last-minute cancellations.",
-    "Offer an admin dashboard with comprehensive controls over appointments, work schedules, and system configuration.",
-    "Implement a responsive, user-friendly patient and admin interface with real-time availability and validation.",
-    "Integrate push notifications and PWA capabilities to enhance user engagement and accessibility.",
-    "Ensure strong security with JWT-based authentication, password hashing, and rate limiting to protect data and prevent abuse.",
-    "Implement client and server-side validation to minimize errors and enforce business logic.",
-    "Optimize performance with React Query, memoization, and efficient database indexing."
+    "Provide an intuitive and efficient online appointment booking system for patients with real-time availability and validation.",
+    "Enable secure appointment cancellation with strict time-based policies and token-based verification.",
+    "Offer a comprehensive admin dashboard for managing appointments, work schedules, and system configurations securely.",
+    "Ensure robust patient management with automated duplicate prevention and validated data entry.",
+    "Deliver PWA features including push notifications for appointment reminders, confirmations, and cancellations.",
+    "Implement end-to-end input validation, authentication, and security best practices to protect sensitive data and ensure system integrity."
   ],
   "key_features": [
-    "Patient Appointment Scheduling with multi-step form including validations and dynamic filtering of health insurance and available times.",
-    "Appointment Confirmation Page displaying detailed appointment info and cancellation policies.",
-    "Secure Appointment Cancellation system with token verification and strict deadline enforcement.",
-    "Admin Dashboard with calendar view, appointment management, and work schedule configuration.",
-    "Dynamic Available Times Management generating 20-minute interval time slots based on schedules and existing bookings.",
-    "Authentication and Authorization for admin users using JWT tokens and secure password reset functionality.",
-    "Unavailable Days and Times Management to mark holidays, vacations, or blocked slots.",
-    "Push Notifications integration using Web Push API for reminders and updates.",
-    "Robust Input Validation using Zod schemas both client and server-side.",
-    "Rate Limiting and API security to prevent misuse.",
-    "PWA readiness with manifest, service worker for offline and push support.",
-    "Reusable UI components built with Shadcn UI and Radix UI for consistent design."
+    "Patient Appointment Scheduling with dynamic visit, consult, practice types, health insurance selection, and 20-minute time slot generation.",
+    "Real-time Available Times Management dynamically accounting for work schedules, unavailable days/times, and existing bookings.",
+    "Secure Authentication and Authorization system for admin users with JWT tokens, password reset, and protected routes.",
+    "Appointment Cancellation system utilizing secure JWT-based tokens, enforcing a 24-hour advance cancellation policy.",
+    "Appointment Confirmation page providing detailed appointment info and cancellation instructions.",
+    "Admin Dashboard with calendar interface, appointment management, and work schedule configurations.",
+    "Patient Management including CRUD operations and phone number uniqueness validation.",
+    "Push Notifications integration leveraging Web Push API with subscription management and various notification types.",
+    "Comprehensive Client and Server-side Input Validation using Zod schemas and API validation.",
+    "Robust API design with rate limiting and error handling for all endpoints.",
+    "PWA features including manifest, service worker, offline capabilities, and install prompt."
   ],
   "user_flow_summary": [
-    "Patient visits home page and navigates to appointment scheduling page.",
-    "Patient fills multi-step appointment form with personal info, selects visit type, consult/practice type, health insurance, date, and available time slot.",
-    "System validates input in real-time and fetches available slots dynamically based on schedule and existing appointments.",
-    "Patient submits form; system creates or links existing patient record, creates appointment, generates cancellation token, and displays confirmation page.",
-    "Patient reviews appointment details including instructions and cancellation link.",
-    "If needed, patient uses cancellation link to access cancellation page, verifies token, and confirms cancellation adhering to the 24-hour policy.",
-    "Admin logs in via secure login dialog; accesses dashboard to view appointments by date using calendar and accordion interface.",
-    "Admin manages work schedules, sets unavailable days/times, and views patient appointments with statuses.",
+    "Patients access the Home Page to learn about the practice and initiate appointment booking.",
+    "Through a multi-step form on the Appointment Scheduling page, patients enter personal details, select visit type, consult/practice type, choose health insurance, date, and available time slot.",
+    "Upon form submission, the system validates inputs, creates or finds the patient record, books the appointment, generates a cancellation token, and directs the patient to a Confirmation page.",
+    "The Confirmation page displays appointment details, cancellation link, and important instructions.",
+    "Patients can cancel appointments securely by accessing the Cancellation page via a tokenized link, verifying eligibility and confirming cancellation.",
+    "Admin users authenticate via a secure login modal and gain access to the Admin Dashboard to view, manage appointments, work schedules, and unavailable times/days via intuitive calendar and accordion interfaces.",
     "Push notifications are sent to subscribed users for appointment reminders, confirmations, and cancellations.",
-    "Password reset flows enable admin users to securely recover access."
+    "Throughout the application, validation errors, API failures, and loading states are handled gracefully with user-friendly messages and UI feedback."
   ],
   "validation_criteria": [
-    "Form validations enforce minimum character lengths, required fields, phone number format, and logical selections (e.g., consult/practice types based on visit type).",
-    "Date selection must restrict past dates, weekends, holidays, and enforce a 30-day advance limit.",
-    "Time slots generated must exclude already booked or unavailable times, ensuring accurate availability display.",
-    "JWT tokens for authentication and cancellation must be securely generated, verified, and expire as configured.",
-    "Cancellation attempts within 12 hours prior to appointment must be rejected by the system.",
-    "API endpoints must respond with appropriate HTTP codes and error messages in case of invalid requests or server errors.",
-    "Admin protected routes must require valid JWT tokens and redirect unauthorized users to login.",
-    "Rate limiting must effectively limit API usage without impacting legitimate users.",
-    "Push notification subscriptions must be properly stored and managed with VAPID keys.",
-    "Database operations must maintain data integrity with unique constraints and indexes.",
-    "End-user error messages must be clear, concise, and in Spanish language for patient forms.",
-    "System components and processes must handle exceptions gracefully and log errors for diagnostics."
+    "Form inputs adhere to Zod validation schemas with appropriate error messaging before enabling submission.",
+    "API responses correctly enforce required fields, date/time formats, existence checks, and business rules.",
+    "JWT-based authentication tokens are issued, stored securely, and validate user access on protected routes.",
+    "Cancellation tokens must be verifiably linked to existing appointments and expire 12 hours before appointment time.",
+    "Time slot generation dynamically excludes unavailable days, times, and existing booked or cancelled appointments.",
+    "Admin functions require authenticated access and proper session management.",
+    "Push notification subscriptions are saved uniquely and trigger notifications correctly as per event type.",
+    "Rate limiting enforces request threshold to prevent API abuse without impacting user experience.",
+    "UI components render correctly on all supported device sizes with responsive and accessible design.",
+    "Error states present clear, localized messages and fallback behaviors that maintain app stability."
   ],
   "code_summary": {
     "tech_stack": [
@@ -101,7 +94,7 @@
       },
       {
         "name": "Authentication & Authorization",
-        "description": "Admin authentication system with JWT tokens, password reset, and protected routes",
+        "description": "Admin authentication system with JWT tokens, password reset, protected routes, and improved authentication flow that checks cached credentials before prompting for login",
         "files": [
           "app/api/auth/login/route.ts",
           "app/api/auth/logout/route.ts",
@@ -112,6 +105,7 @@
           "lib/auth-edge.ts",
           "components/admin/LoginDialog.tsx",
           "components/admin/ProtectedRoute.tsx",
+          "components/agendar-visita/FooterRoot.tsx",
           "lib/AuthContext.tsx",
           "middleware.ts"
         ]

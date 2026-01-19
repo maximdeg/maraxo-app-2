@@ -1,30 +1,30 @@
 [
   {
     "id": "TC001",
-    "title": "Patient Appointment Scheduling - Successful Booking with Valid Inputs",
-    "description": "Verify that a patient can successfully complete the multi-step appointment form with valid inputs, including selecting visit type, consult type, practice type, health insurance, date, and available time slot.",
+    "title": "Successful Appointment Scheduling",
+    "description": "Verify that a patient can successfully book an appointment with valid details including visit type, consult type, practice type, health insurance, date, and time slot.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the appointment scheduling page."
+        "description": "Navigate to the Appointment Scheduling page."
       },
       {
         "type": "action",
-        "description": "Fill out patient personal information with valid data."
+        "description": "Fill in patient personal details with valid data."
       },
       {
         "type": "action",
-        "description": "Select valid visit type, consult type, practice type, and health insurance options."
+        "description": "Select visit type, consult type, practice type, and health insurance."
       },
       {
         "type": "action",
-        "description": "Choose an available date within the allowed 30-day advance window, excluding weekends and holidays."
+        "description": "Select a valid date with available time slots."
       },
       {
         "type": "action",
-        "description": "Select an available 20-minute interval timeslot from the dynamically filtered available times."
+        "description": "Choose an available 20-minute time slot."
       },
       {
         "type": "action",
@@ -32,125 +32,133 @@
       },
       {
         "type": "assertion",
-        "description": "Confirm the appointment is created, patient record is linked or created, and the confirmation page displays correct appointment details."
+        "description": "Confirm that the appointment is created successfully."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm patient record is created if new."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify redirection to the Confirmation page with correct appointment details and cancellation instructions."
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Patient Appointment Scheduling - Form Validations on Invalid Inputs",
-    "description": "Verify that all client and server-side validations enforce required fields, minimum character lengths, phone number formats, and logical selections, and display appropriate error messages in Spanish.",
+    "title": "Appointment Scheduling Input Validation",
+    "description": "Verify that the system enforces client and server-side input validation for all fields in the appointment form and displays appropriate error messages.",
     "category": "error handling",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the appointment scheduling page."
+        "description": "Navigate to the Appointment Scheduling page."
       },
       {
         "type": "action",
-        "description": "Attempt to submit the form leaving required fields blank."
+        "description": "Leave required fields blank and attempt to submit."
       },
       {
         "type": "assertion",
-        "description": "Client displays Spanish error messages for all missing required fields."
+        "description": "Verify that validation errors are shown for missing mandatory inputs."
       },
       {
         "type": "action",
-        "description": "Input invalid phone number format."
+        "description": "Enter invalid formats (e.g., invalid date formats, unsupported characters)."
       },
       {
         "type": "assertion",
-        "description": "Form validation fails with appropriate Spanish error message."
+        "description": "Ensure validation errors appear for invalid data formats."
       },
       {
         "type": "action",
-        "description": "Select inconsistent consult type or practice type not allowed for chosen visit type."
+        "description": "Try to select a date or time slot outside available ranges."
       },
       {
         "type": "assertion",
-        "description": "Validation prevents submission with relevant error."
-      },
-      {
-        "type": "action",
-        "description": "Select a past date, weekend, holiday, or date beyond 30 days in the future."
-      },
-      {
-        "type": "assertion",
-        "description": "Date picker disables or prevents selection and shows error message."
+        "description": "Verify system blocks submission and shows appropriate message."
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Dynamic Available Times Management - Verify Time Slot Filtering",
-    "description": "Test that available 20-minute interval time slots are dynamically generated based on work schedule, existing bookings, and unavailable days/times, excluding blocked or fully booked slots.",
+    "title": "Time Slot Generation Respects Work Schedule and Existing Bookings",
+    "description": "Ensure that available time slots generated dynamically exclude times outside the doctor's work schedule, unavailable days/times, and slots already booked or canceled.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Request available time slots for a given valid date."
+        "description": "Query available time slots for a date within work schedule with existing appointments."
       },
       {
         "type": "assertion",
-        "description": "Response returns time slots spaced at 20-minute intervals within doctor’s work hours for that date."
+        "description": "Confirm times outside work hours are not listed."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm unavailable days and time slots are excluded."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure already booked or canceled appointments’ slots are removed from availability."
       },
       {
         "type": "action",
-        "description": "Ensure slots that coincide with existing appointments, unavailable days, or blocked times are excluded."
+        "description": "Retrieve available time slots for a day with no work schedule."
       },
       {
         "type": "assertion",
-        "description": "No overlaps of time slots with already booked appointments or unavailable periods."
+        "description": "Verify no available time slots are returned."
       }
     ]
   },
   {
     "id": "TC004",
-    "title": "Secure Appointment Cancellation - Valid Token and Policy Enforcement",
-    "description": "Verify that appointment cancellation requires a valid token, the token is verified securely, and cancellations within 12 hours prior to appointment are rejected as per policy.",
+    "title": "Secure Appointment Cancellation with Token Verification and Time Policy",
+    "description": "Validate that appointment cancellation requires a valid JWT-based token linked to an existing appointment and is only allowed if cancellation is requested at least 24 hours before the appointment time.",
     "category": "security",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Access the cancellation page using a valid cancellation token."
+        "description": "Access the cancellation page using a valid token linked to a future appointment more than 24 hours away."
       },
       {
         "type": "assertion",
-        "description": "Token is verified successfully and corresponding appointment details are displayed."
+        "description": "Confirm the system allows cancellation and shows confirmation option."
       },
       {
         "type": "action",
-        "description": "Attempt to cancel an appointment more than 12 hours before scheduled time."
+        "description": "Confirm cancellation."
       },
       {
         "type": "assertion",
-        "description": "Cancellation succeeds and appointment status updates accordingly."
+        "description": "Verify appointment status is updated to canceled in the system."
       },
       {
         "type": "action",
-        "description": "Attempt to cancel an appointment within 12 hours of scheduled time."
+        "description": "Attempt cancellation with a valid token but less than 24 hours before the appointment."
       },
       {
         "type": "assertion",
-        "description": "System rejects cancellation with appropriate Spanish error message."
+        "description": "Verify cancellation is rejected with a clear policy message."
       },
       {
         "type": "action",
-        "description": "Access cancellation page with invalid or expired token."
+        "description": "Attempt cancellation with an invalid, expired, or tampered token."
       },
       {
         "type": "assertion",
-        "description": "Access is denied or error message is shown preventing cancellation."
+        "description": "Confirm cancellation fails and an error message about token validity is displayed."
       }
     ]
   },
   {
     "id": "TC005",
-    "title": "Admin Dashboard - Login and Authentication with JWT",
-    "description": "Verify that admin users can log in using valid credentials, receive a JWT token, and that protected admin routes require the token and reject unauthorized access.",
+    "title": "Admin Authentication and Access Control",
+    "description": "Verify secure login for admin users using JWT tokens, including correct credential verification, token issuance, protected route access, and logout functionality.",
     "category": "security",
     "priority": "High",
     "steps": [
@@ -160,245 +168,278 @@
       },
       {
         "type": "action",
-        "description": "Input valid admin username and password."
-      },
-      {
-        "type": "action",
-        "description": "Submit login form."
+        "description": "Enter valid admin credentials and submit."
       },
       {
         "type": "assertion",
-        "description": "User receives JWT token and is redirected to admin dashboard."
-      },
-      {
-        "type": "action",
-        "description": "Logout and attempt to access admin dashboard without logging in."
+        "description": "Confirm JWT token is issued and stored securely."
       },
       {
         "type": "assertion",
-        "description": "Access is denied and user redirected to login page."
+        "description": "Verify user is granted access to the Admin Dashboard."
       },
       {
         "type": "action",
-        "description": "Attempt login with invalid credentials."
+        "description": "Attempt to access admin protected routes without authentication."
       },
       {
         "type": "assertion",
-        "description": "Login fails with appropriate error message."
+        "description": "Verify redirection to login or access denial occurs."
+      },
+      {
+        "type": "action",
+        "description": "Logout from admin account."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm JWT token is invalidated and protected routes become inaccessible."
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Admin Dashboard - Manage Work Schedules and Unavailable Days/Times",
-    "description": "Verify that the admin can add, update, and delete doctor’s work schedules, mark unavailable days and times, and that these changes affect available appointment slots accordingly.",
+    "title": "Patient Phone Number Uniqueness Validation",
+    "description": "Ensure the system prevents creation of duplicate patient records by enforcing phone number uniqueness during patient creation and updates.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Login as admin and navigate to work schedule management interface."
-      },
-      {
-        "type": "action",
-        "description": "Add a new work schedule time frame for a specific date range."
+        "description": "Attempt to create a new patient record with a phone number already assigned to another patient."
       },
       {
         "type": "assertion",
-        "description": "New work schedule is saved and reflected on available times."
+        "description": "Verify validation error is returned preventing duplication."
       },
       {
         "type": "action",
-        "description": "Mark specific dates as unavailable (holidays, vacations)."
+        "description": "Update an existing patient record to change the phone number to one already in use."
       },
       {
         "type": "assertion",
-        "description": "Unavailable dates are blocked from appointments in the scheduling UI."
+        "description": "Confirm update is blocked and proper error message shown."
       },
       {
         "type": "action",
-        "description": "Block specific time slots within a day as unavailable."
+        "description": "Create or update patient with a unique phone number."
       },
       {
         "type": "assertion",
-        "description": "Those times are excluded from available appointment times."
-      },
-      {
-        "type": "action",
-        "description": "Update and delete work schedule entries."
-      },
-      {
-        "type": "assertion",
-        "description": "Changes apply correctly without data integrity issues."
+        "description": "Verify that operation succeeds."
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Appointment Confirmation Page - Display Accurate Appointment Details",
-    "description": "Verify that the confirmation page correctly displays all relevant appointment details including visit type, consult/practice type, health insurance, date, time, cancellation link, and policy instructions.",
+    "title": "Admin Dashboard Appointment and Work Schedule Management",
+    "description": "Verify that admin users can view, create, update, and delete appointments and configure work schedules and unavailable days/times using the dashboard UI components.",
     "category": "functional",
-    "priority": "Medium",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Complete an appointment booking."
+        "description": "Login as admin and open the Admin Dashboard."
       },
       {
         "type": "action",
-        "description": "Navigate to the confirmation page."
+        "description": "Navigate to appointment calendar and verify appointments are listed correctly."
+      },
+      {
+        "type": "action",
+        "description": "Create a new appointment via admin interface."
       },
       {
         "type": "assertion",
-        "description": "Page displays correct patient info, appointment details, cancellation policy, and unique cancellation link."
+        "description": "Verify the appointment is added and reflected in the calendar."
+      },
+      {
+        "type": "action",
+        "description": "Modify doctor's work schedule and save changes."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm changes persist and affect available time slot generation."
+      },
+      {
+        "type": "action",
+        "description": "Set unavailable days and time slots via UI."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify these days/times are excluded from availability."
+      },
+      {
+        "type": "action",
+        "description": "Delete or update existing appointments and work schedules."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure modifications are saved and reflected immediately."
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "API Rate Limiting - Prevent Abuse while Allowing Legitimate Usage",
-    "description": "Verify that API endpoints enforce rate limits to prevent misuse, respond with appropriate HTTP status codes when limits are exceeded, and do not impede normal user operations.",
-    "category": "security",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Send rapid consecutive requests exceeding rate limit threshold to an API endpoint."
-      },
-      {
-        "type": "assertion",
-        "description": "Server responds with HTTP 429 Too Many Requests and appropriate error message."
-      },
-      {
-        "type": "action",
-        "description": "Send regular user requests within limits."
-      },
-      {
-        "type": "assertion",
-        "description": "All requests succeed with expected responses and no blocking."
-      }
-    ]
-  },
-  {
-    "id": "TC009",
-    "title": "Patient Management - CRUD Operations with Phone Validation",
-    "description": "Verify that patient records can be created, read, updated, and deleted via API with phone number validation enforcing correct format.",
+    "title": "Appointment Confirmation Page Display",
+    "description": "Check that after booking, patients are shown a confirmation page with full appointment details and clear cancellation instructions.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Create patient record with valid phone number via API."
+        "description": "Complete a valid appointment booking flow."
       },
       {
         "type": "assertion",
-        "description": "Patient record created successfully."
-      },
-      {
-        "type": "action",
-        "description": "Attempt to create/update patient record with invalid phone number format."
+        "description": "Verify the Confirmation page loads with correct appointment info including date, time, visit type, and practice details."
       },
       {
         "type": "assertion",
-        "description": "Request is rejected with validation error message."
-      },
-      {
-        "type": "action",
-        "description": "Retrieve patient record by ID."
+        "description": "Confirm cancellation link with secure token is displayed."
       },
       {
         "type": "assertion",
-        "description": "Patient data returned correctly."
-      },
-      {
-        "type": "action",
-        "description": "Update patient record information with valid data."
-      },
-      {
-        "type": "assertion",
-        "description": "Update succeeds and data is saved."
-      },
-      {
-        "type": "action",
-        "description": "Delete patient record."
-      },
-      {
-        "type": "assertion",
-        "description": "Record is removed successfully."
+        "description": "Ensure instructions about cancellation policy are clearly visible."
       }
     ]
   },
   {
-    "id": "TC010",
-    "title": "Password Reset Flow for Admin Users",
-    "description": "Verify that admin users can request password reset via email, receive password reset link, and securely update their password.",
+    "id": "TC009",
+    "title": "API Rate Limiting Enforcement",
+    "description": "Validate that API endpoints enforce rate limiting to prevent abuse while allowing legitimate use without disruption.",
     "category": "security",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to admin password reset request page."
-      },
-      {
-        "type": "action",
-        "description": "Submit valid admin email for password reset request."
+        "description": "Perform repeated rapid API requests exceeding threshold limits."
       },
       {
         "type": "assertion",
-        "description": "System sends password reset email with secure token link."
+        "description": "Verify rate limiting responses (e.g., HTTP 429) are returned when threshold exceeded."
       },
       {
         "type": "action",
-        "description": "Access reset-password page with valid token."
-      },
-      {
-        "type": "action",
-        "description": "Input and confirm new valid password."
+        "description": "Perform legitimate API requests within limits."
       },
       {
         "type": "assertion",
-        "description": "Password is updated, user is notified of success."
-      },
+        "description": "Confirm that API responses are successful and normal."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Input Validation on API Endpoints Using Zod Schemas",
+    "description": "Ensure all API endpoints validate inputs strictly according to Zod schemas including required fields, formats, and business rules, returning appropriate errors on invalid input.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
       {
         "type": "action",
-        "description": "Try to access reset-password with invalid/expired token."
+        "description": "Send API requests with missing required fields to appointment creation, patient management, and authentication endpoints."
       },
       {
         "type": "assertion",
-        "description": "Access is denied or error message is shown indicating invalid token."
+        "description": "Confirm detailed validation errors are returned for each missing field."
+      },
+      {
+        "type": "action",
+        "description": "Send API requests with invalid data types and formats."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify API rejects requests with appropriate error messages."
+      },
+      {
+        "type": "action",
+        "description": "Send requests violating business rules (e.g. booking appointment on unavailable date)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm API responds with clear business rule violation responses."
       }
     ]
   },
   {
     "id": "TC011",
-    "title": "API Error Handling - Verify Proper HTTP Codes and Error Messages",
-    "description": "Validate that API endpoints respond with correct HTTP status codes and localized error messages in Spanish when invalid requests or server errors occur.",
-    "category": "error handling",
+    "title": "Push Notification Subscription and Notification Sending",
+    "description": "Validate web push notification subscription management for patients and that appointment reminders, confirmations, and cancellations trigger appropriate push notifications.",
+    "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Send invalid data in appointment creation API endpoint."
+        "description": "Subscribe a user to push notifications via the application interface."
       },
       {
         "type": "assertion",
-        "description": "Receive HTTP 400 Bad Request with descriptive Spanish error message."
+        "description": "Confirm subscription details are saved uniquely."
       },
       {
         "type": "action",
-        "description": "Access protected API endpoint without valid JWT token."
+        "description": "Trigger appointment confirmation event."
       },
       {
         "type": "assertion",
-        "description": "Receive HTTP 401 Unauthorized with appropriate error message."
+        "description": "Verify push notification for confirmation is sent and received."
       },
       {
         "type": "action",
-        "description": "Simulate server error (e.g. disconnect DB) and send request."
+        "description": "Trigger appointment reminder event."
       },
       {
         "type": "assertion",
-        "description": "Receive HTTP 500 Internal Server Error with generic error message; error is logged server-side."
+        "description": "Verify reminder notification delivery."
+      },
+      {
+        "type": "action",
+        "description": "Trigger appointment cancellation event."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm cancellation notification is pushed correctly."
+      },
+      {
+        "type": "action",
+        "description": "Unsubscribe user from push notifications."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify subscription is removed and no notifications are sent thereafter."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Responsive and Accessible UI Rendering",
+    "description": "Check that all major UI components render correctly and remain usable and accessible across supported device sizes and screen resolutions, including mobile and desktop.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open critical application pages such as Home, Appointment Scheduling, Confirmation, Cancellation, and Admin Dashboard on desktop browser."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI elements are properly aligned, visible, and functional."
+      },
+      {
+        "type": "action",
+        "description": "Repeat UI checks on different mobile device emulator sizes."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure UI components adapt responsively and remain accessible via keyboard and screen readers."
+      },
+      {
+        "type": "action",
+        "description": "Check that error, loading, and confirmation dialogs display correct messages and maintain visual clarity."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm no critical UI regressions or broken layouts are present."
       }
     ]
   }

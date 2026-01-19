@@ -7,10 +7,8 @@ export const runtime = 'nodejs';
 export async function GET() {
     try {
         const consultTypes = await query("SELECT * FROM consult_types ORDER BY name");
-        return NextResponse.json({ 
-            consultTypes: consultTypes.rows,
-            count: consultTypes.rows.length
-        }, { status: 200 });
+        // Return as array for API consistency
+        return NextResponse.json(consultTypes.rows, { status: 200 });
     } catch (error) {
         console.error("Database query error:", error);
         return NextResponse.json({ error: "Failed to fetch consult types" }, { status: 500 });

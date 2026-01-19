@@ -1,0 +1,169 @@
+import asyncio
+from playwright import async_api
+from playwright.async_api import expect
+
+async def run_test():
+    pw = None
+    browser = None
+    context = None
+    
+    try:
+        # Start a Playwright session in asynchronous mode
+        pw = await async_api.async_playwright().start()
+        
+        # Launch a Chromium browser in headless mode with custom arguments
+        browser = await pw.chromium.launch(
+            headless=True,
+            args=[
+                "--window-size=1280,720",         # Set the browser window size
+                "--disable-dev-shm-usage",        # Avoid using /dev/shm which can cause issues in containers
+                "--ipc=host",                     # Use host-level IPC for better stability
+                "--single-process"                # Run the browser in a single process mode
+            ],
+        )
+        
+        # Create a new browser context (like an incognito window)
+        context = await browser.new_context()
+        context.set_default_timeout(5000)
+        
+        # Open a new page in the browser context
+        page = await context.new_page()
+        
+        # Navigate to your target URL and wait until the network request is committed
+        await page.goto("http://localhost:3000/admin", wait_until="commit", timeout=10000)
+        
+        # Wait for the main page to reach DOMContentLoaded state (optional for stability)
+        try:
+            await page.wait_for_load_state("domcontentloaded", timeout=3000)
+        except async_api.Error:
+            pass
+        
+        # Iterate through all iframes and wait for them to load as well
+        for frame in page.frames:
+            try:
+                await frame.wait_for_load_state("domcontentloaded", timeout=3000)
+            except async_api.Error:
+                pass
+        
+        # Interact with the page elements to simulate user flow
+        # -> Input email and password, then submit login form to authenticate.
+        frame = context.pages[-1]
+        # Input the email for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('maxim.degtiarev.dev@gmail.com')
+        
+
+        frame = context.pages[-1]
+        # Input the password for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin1234')
+        
+
+        frame = context.pages[-1]
+        # Click the login button to submit credentials
+        elem = frame.locator('xpath=html/body/div[2]/div/form/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Access the cancellation page using a valid token linked to a future appointment more than 24 hours away.
+        await page.goto('http://localhost:3000/cancel?token=valid_future_appointment_token', timeout=10000)
+        await asyncio.sleep(3)
+        
+
+        # -> Input email and password again to re-authenticate and access admin panel.
+        frame = context.pages[-1]
+        # Input email for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('maxim.degtiarev.dev@gmail.com')
+        
+
+        frame = context.pages[-1]
+        # Input password for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin1234')
+        
+
+        frame = context.pages[-1]
+        # Click login button to submit credentials
+        elem = frame.locator('xpath=html/body/div[2]/div/form/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Access the cancellation page using a valid token linked to a future appointment more than 24 hours away.
+        await page.goto('http://localhost:3000/cancel?token=valid_future_appointment_token', timeout=10000)
+        await asyncio.sleep(3)
+        
+
+        # -> Input email and password to log in again and access admin panel.
+        frame = context.pages[-1]
+        # Input email for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('maxim.degtiarev.dev@gmail.com')
+        
+
+        frame = context.pages[-1]
+        # Input password for login
+        elem = frame.locator('xpath=html/body/div[2]/div/form/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin1234')
+        
+
+        frame = context.pages[-1]
+        # Click login button to submit credentials
+        elem = frame.locator('xpath=html/body/div[2]/div/form/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Extract appointment data or tokens from the admin panel or backend to obtain a valid JWT token for cancellation testing.
+        frame = context.pages[-1]
+        # Click on 'Calendario' to view appointments and possibly extract tokens or appointment details
+        elem = frame.locator('xpath=html/body/div/div/div/div/h3/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Select a day with an appointment more than 24 hours away to check for appointment details or cancellation tokens.
+        frame = context.pages[-1]
+        # Click on day 15 in the calendar to check appointments
+        elem = frame.locator('xpath=html/body/div/div/div/div/div/div/div/div/div/div/div/table/tbody/tr[3]/td[5]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Click 'Editar dia' to view or extract appointment details or tokens for cancellation testing.
+        frame = context.pages[-1]
+        # Click 'Editar dia' to view appointment details for January 15, 2026
+        elem = frame.locator('xpath=html/body/div/div/div/div/div/div/div/div[2]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Close the 'Editar dia' modal and look for appointment details or tokens elsewhere in the admin panel or calendar interface.
+        frame = context.pages[-1]
+        # Click 'Close' button to close the 'Editar dia' modal
+        elem = frame.locator('xpath=html/body/div[3]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Look for appointment details or tokens in the calendar interface or admin panel to obtain a valid JWT token for cancellation testing.
+        await page.mouse.wheel(0, 300)
+        
+
+        # -> Look for any clickable elements or text related to appointment details, tokens, or cancellation links in the visible page area.
+        await page.mouse.wheel(0, 300)
+        
+
+        # --> Assertions to verify final state
+        frame = context.pages[-1]
+        try:
+            await expect(frame.locator('text=Cancellation Successful').first).to_be_visible(timeout=1000)
+        except AssertionError:
+            raise AssertionError("Test case failed: Appointment cancellation validation failed. The system did not allow cancellation as expected based on JWT token validity and timing policies.")
+        await asyncio.sleep(5)
+    
+    finally:
+        if context:
+            await context.close()
+        if browser:
+            await browser.close()
+        if pw:
+            await pw.stop()
+            
+asyncio.run(run_test())
+    

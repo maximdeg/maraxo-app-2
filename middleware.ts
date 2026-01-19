@@ -31,7 +31,11 @@ export function middleware(request: NextRequest) {
   
   // Protect admin API routes
   if (pathname.startsWith('/api/admin')) {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    // Check for token in Authorization header first, then cookies
+    const authHeader = request.headers.get('authorization')
+    const tokenFromHeader = authHeader?.replace('Bearer ', '')
+    const tokenFromCookie = request.cookies.get('auth-token')?.value
+    const token = tokenFromHeader || tokenFromCookie
     
     if (!token) {
       return NextResponse.json(

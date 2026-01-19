@@ -14,40 +14,54 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { user, isLoading, login, checkAuth } = useAuth();
     const [showLoginDialog, setShowLoginDialog] = useState(false);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
-    const router = useRouter();
 
     useEffect(() => {
         const checkSession = async () => {
-            if (!isLoading) {
-                if (!user) {
-                    // Check if user is already authenticated via cookie
-                    const isAuthenticated = await checkAuth();
-                    if (!isAuthenticated) {
-                        setShowLoginDialog(true);
-                    }
-                }
+            // Wait for AuthContext to finish initial loading
+            if (isLoading) {
+                return;
+            }
+
+            // If user is already in context, we're done
+            if (user) {
                 setIsCheckingSession(false);
+                setShowLoginDialog(false);
+                return;
+            }
+
+            // User is not in context, check if they're authenticated via cookie
+            // This will update the user state in AuthContext if authenticated
+            const isAuthenticated = await checkAuth();
+            
+            setIsCheckingSession(false);
+            
+            // Only show login dialog if authentication check failed
+            // If checkAuth succeeded, it will have set the user in context,
+            // and this component will re-render with user set
+            if (!isAuthenticated) {
+                setShowLoginDialog(true);
             }
         };
 
         checkSession();
-    }, [isLoading, user, checkAuth]);
+    }, [isLoading, checkAuth]);
+
+    // Update checking state when user changes (e.g., after successful login)
+    useEffect(() => {
+        if (user) {
+            setIsCheckingSession(false);
+            setShowLoginDialog(false);
+        }
+    }, [user]);
 
     const handleLoginSuccess = async (userData: any, token: string) => {
         login(userData, token);
         setShowLoginDialog(false);
-        setIsCheckingSession(false); // Stop checking session since we have a user
+        setIsCheckingSession(false);
         
         // No need to redirect since we're already on the admin page
         // The component will re-render and show the admin content
     };
-
-    // Check if user is already authenticated when component mounts
-    useEffect(() => {
-        if (user) {
-            setIsCheckingSession(false);
-        }
-    }, [user]);
 
     if (isLoading || isCheckingSession) {
         return (
