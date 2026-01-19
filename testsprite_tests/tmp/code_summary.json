@@ -1,0 +1,235 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 15",
+    "React 18",
+    "PostgreSQL",
+    "Tailwind CSS",
+    "Shadcn UI",
+    "Radix UI",
+    "React Hook Form",
+    "Zod",
+    "NextAuth.js",
+    "Redux Toolkit",
+    "TanStack Query",
+    "Web Push API",
+    "PWA"
+  ],
+  "features": [
+    {
+      "name": "Appointment Scheduling",
+      "description": "Core feature allowing patients to book appointments with date, time, visit type, consult type, practice type, and health insurance selection",
+      "files": [
+        "app/agendar-visita/page.tsx",
+        "components/agendar-visita/AppointmentForm.tsx",
+        "components/agendar-visita/AvailableTimesComponent.tsx",
+        "components/agendar-visita/AvailableTimesComponentImproved.tsx",
+        "components/agendar-visita/FooterRoot.tsx",
+        "app/api/appointments/create/route.ts",
+        "app/api/appointments/route.ts",
+        "app/api/appointments/[id]/route.ts",
+        "app/api/appointments/date/[date]/route.ts",
+        "lib/actions.ts"
+      ]
+    },
+    {
+      "name": "Available Times Management",
+      "description": "Dynamic time slot generation based on work schedule, existing appointments, and unavailable times",
+      "files": [
+        "app/api/available-times/route.ts",
+        "app/api/available-times/[date]/route.ts",
+        "components/agendar-visita/AvailableTimesComponent.tsx",
+        "components/agendar-visita/AvailableTimesComponentImproved.tsx"
+      ]
+    },
+    {
+      "name": "Authentication & Authorization",
+      "description": "Admin authentication system with JWT tokens, password reset, and protected routes",
+      "files": [
+        "app/api/auth/login/route.ts",
+        "app/api/auth/logout/route.ts",
+        "app/api/auth/forgot-password/route.ts",
+        "app/api/auth/reset-password/route.ts",
+        "app/api/auth/verify/route.ts",
+        "lib/auth.ts",
+        "lib/auth-edge.ts",
+        "components/admin/LoginDialog.tsx",
+        "components/admin/ProtectedRoute.tsx",
+        "lib/AuthContext.tsx",
+        "middleware.ts"
+      ]
+    },
+    {
+      "name": "Patient Management",
+      "description": "CRUD operations for patient records with phone number validation",
+      "files": [
+        "app/api/patients/route.ts",
+        "app/api/patients/[id]/route.ts"
+      ]
+    },
+    {
+      "name": "Admin Panel",
+      "description": "Admin interface for managing appointments, work schedules, and system configuration",
+      "files": [
+        "app/(admin)/admin/page.tsx",
+        "app/(admin)/layout.tsx",
+        "components/admin/AdminHeader.tsx",
+        "components/admin/AdminFooter.tsx",
+        "components/admin/AppointmentCard.tsx",
+        "components/admin/AccordionComponent.tsx",
+        "components/admin/AccordionItemList.tsx",
+        "components/admin/DialogComponent.tsx",
+        "components/admin/SelectTimeComponent.tsx"
+      ]
+    },
+    {
+      "name": "Appointment Cancellation",
+      "description": "Secure cancellation system with token-based verification and 24-hour policy enforcement",
+      "files": [
+        "app/cancelar-cita/page.tsx",
+        "app/api/cancel-appointment/route.ts",
+        "app/api/cancel-appointment/verify/route.ts",
+        "lib/cancellation-token.ts"
+      ]
+    },
+    {
+      "name": "Appointment Confirmation",
+      "description": "Confirmation page displaying appointment details and cancellation information",
+      "files": [
+        "app/confirmation/page.tsx"
+      ]
+    },
+    {
+      "name": "Work Schedule Management",
+      "description": "API endpoints for managing doctor's work schedule configuration",
+      "files": [
+        "app/api/work-schedule/route.ts",
+        "app/api/work-schedule/[id]/route.ts"
+      ]
+    },
+    {
+      "name": "Unavailable Days Management",
+      "description": "System for marking specific dates as unavailable (holidays, vacations, etc.)",
+      "files": [
+        "app/api/unavailable-days/route.ts",
+        "app/api/unavailable-days/[date]/route.ts"
+      ]
+    },
+    {
+      "name": "Unavailable Times Management",
+      "description": "System for marking specific time slots as unavailable",
+      "files": [
+        "app/api/unavailable-times/route.ts",
+        "app/api/unavailable-times/[date]/route.ts"
+      ]
+    },
+    {
+      "name": "Health Insurance Management",
+      "description": "API for retrieving health insurance options with pricing information",
+      "files": [
+        "app/api/health-insurance/route.ts",
+        "data/obras-sociales.json"
+      ]
+    },
+    {
+      "name": "Visit Types Management",
+      "description": "API for managing visit types (Consulta, Practica, etc.)",
+      "files": [
+        "app/api/visit-types/route.ts"
+      ]
+    },
+    {
+      "name": "Consult Types Management",
+      "description": "API for managing consult types (Primera vez, Seguimiento)",
+      "files": [
+        "app/api/consult-types/route.ts"
+      ]
+    },
+    {
+      "name": "Push Notifications",
+      "description": "Web Push API integration for sending notifications to subscribed users",
+      "files": [
+        "app/api/push/subscribe/route.ts",
+        "app/api/push/unsubscribe/route.ts",
+        "app/api/push/send/route.ts",
+        "lib/push-notifications.ts"
+      ]
+    },
+    {
+      "name": "Input Validation",
+      "description": "Client and server-side validation using Zod schemas",
+      "files": [
+        "lib/validation.ts"
+      ]
+    },
+    {
+      "name": "Rate Limiting",
+      "description": "API rate limiting to prevent abuse and ensure system stability",
+      "files": [
+        "lib/rate-limit.ts"
+      ]
+    },
+    {
+      "name": "Database Operations",
+      "description": "PostgreSQL database connection and query utilities",
+      "files": [
+        "lib/db.ts"
+      ]
+    },
+    {
+      "name": "UI Components",
+      "description": "Reusable UI components built with Shadcn UI and Radix UI",
+      "files": [
+        "components/ui/button.tsx",
+        "components/ui/input.tsx",
+        "components/ui/label.tsx",
+        "components/ui/select.tsx",
+        "components/ui/calendar.tsx",
+        "components/ui/dialog.tsx",
+        "components/ui/alert.tsx",
+        "components/ui/alert-dialog.tsx",
+        "components/ui/card.tsx",
+        "components/ui/form.tsx",
+        "components/ui/popover.tsx",
+        "components/ui/accordion.tsx",
+        "components/ui/switch.tsx",
+        "components/ui/skeleton.tsx",
+        "components/ui/sonner.tsx"
+      ]
+    },
+    {
+      "name": "Password Reset",
+      "description": "Password reset functionality with email verification",
+      "files": [
+        "app/reset-password/page.tsx",
+        "app/api/auth/reset-password/route.ts",
+        "app/api/auth/forgot-password/route.ts"
+      ]
+    },
+    {
+      "name": "Root Page",
+      "description": "Main landing page of the application",
+      "files": [
+        "app/(root)/page.tsx",
+        "app/layout.tsx"
+      ]
+    },
+    {
+      "name": "State Management",
+      "description": "Redux store and user slice for global state management",
+      "files": [
+        "state/store.ts",
+        "state/userInfo/userSlice.ts"
+      ]
+    },
+    {
+      "name": "Utilities",
+      "description": "Helper functions and utilities used across the application",
+      "files": [
+        "lib/utils.ts",
+        "lib/types.ts"
+      ]
+    }
+  ]
+}
+

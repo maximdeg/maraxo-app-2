@@ -6,41 +6,67 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
     try {
-        const { selectedDate, isDayOff } = await request.json();
+        const body = await request.json();
+        const { selectedDate, unavailable_date, isDayOff, is_confirmed } = body;
 
-        if (!selectedDate) {
+        // Accept both selectedDate (Date object) and unavailable_date (string)
+        let dateToUse: string;
+        if (unavailable_date) {
+            // If unavailable_date is provided as string (YYYY-MM-DD format)
+            dateToUse = unavailable_date;
+        } else if (selectedDate) {
+            // If selectedDate is provided as Date object or string
+            if (typeof selectedDate === 'string') {
+                dateToUse = selectedDate;
+            } else {
+                // Date object
+                const date = new Date(selectedDate);
+                dateToUse = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            }
+        } else {
             return NextResponse.json(
-                { error: "Date is required" },
+                { error: "Date is required (provide 'unavailable_date' or 'selectedDate')" },
                 { status: 400 }
             );
         }
 
-        const formatedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+        // Validate date format
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateToUse)) {
+            return NextResponse.json(
+                { error: "Invalid date format. Expected YYYY-MM-DD" },
+                { status: 400 }
+            );
+        }
+
+        // Use is_confirmed if provided, otherwise use isDayOff, default to true
+        const confirmed = is_confirmed !== undefined ? is_confirmed : (isDayOff !== undefined ? isDayOff : true);
 
         // Check if record already exists
         const existingRecord = await query(
             "SELECT id FROM unavailable_days WHERE unavailable_date = $1",
-            [formatedDate]
+            [dateToUse]
         );
 
         if (existingRecord.rows.length > 0) {
             // Update existing record
             await query(
                 "UPDATE unavailable_days SET is_confirmed = $1 WHERE unavailable_date = $2",
-                [isDayOff, formatedDate]
+                [confirmed, dateToUse]
             );
         } else {
             // Insert new record
             await query(
                 "INSERT INTO unavailable_days (unavailable_date, is_confirmed) VALUES ($1, $2)",
-                [formatedDate, isDayOff]
+                [dateToUse, confirmed]
             );
         }
 
         return NextResponse.json({
             success: true,
-            message: isDayOff ? "Day marked as unavailable" : "Day marked as available"
-        });
+            message: confirmed ? "Day marked as unavailable" : "Day marked as available",
+            unavailable_date: dateToUse,
+            is_confirmed: confirmed
+        }, { status: 201 });
 
     } catch (error) {
         console.error('Error updating unavailable day:', error);

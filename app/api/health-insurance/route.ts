@@ -11,7 +11,17 @@ export async function GET() {
         const fileContent = readFileSync(filePath, 'utf-8');
         const healthInsuranceData = JSON.parse(fileContent);
         
-        return NextResponse.json(healthInsuranceData, { status: 200 });
+        // Normalize the data structure - ensure consistent format
+        const normalizedData = healthInsuranceData.map((item: any, index: number) => ({
+            id: index + 1,
+            name: item.name,
+            price: item.price || null, // Keep as string or null (e.g., "$25.000" or null)
+            price_numeric: item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : null, // Extract numeric value for convenience
+            notes: item.notes || null,
+            pricing: item.price || null // Alias for backward compatibility
+        }));
+        
+        return NextResponse.json(normalizedData, { status: 200 });
     } catch (error) {
         console.error("Error reading health insurance data:", error);
         return NextResponse.json(

@@ -1,0 +1,19 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000/admin",
+  "backendAuthType": "basic token",
+  "backendUsername": "maxim.degtiarev.dev@gmail.com",
+  "backendPassword": "admin1234",
+  "executionArgs": {
+    "projectName": "maraxo-app-2-main",
+    "projectPath": "C:\\Users\\Maxim\\work\\Maraxo app\\maraxo-app-2-main",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-ad-jY1xujUMdwvPG1bBtHYQvIhFjghrOQ3bP7RRERlyJ0AkAYhyNmlw6GS1S33_uWlyugEeICiltFa_b95z5ut7MgSaKSVx3TbCqSsSddikKrB7AmO69usOZcVXioTC_bjc"
+    }
+  },
+  "proxy": "http://c89b0f6d-af74-46d9-988b-901462f5b24e:qQu4muIPSLtqbXpcXbN3oLKypR5rFEvE@tun.testsprite.com:8080"
+}

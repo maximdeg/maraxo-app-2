@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "patient_appointment_scheduling_api",
+    "description": "Test the appointment scheduling API endpoint to ensure patients can successfully book appointments with all required details including visit type, consult type, practice type, and health insurance selection. Validate input data, check for correct creation of patient records and appointments, and verify generation of cancellation tokens."
+  },
+  {
+    "id": "TC002",
+    "title": "available_times_api",
+    "description": "Verify the available times API endpoint dynamically generates 20-minute interval time slots based on the doctor's work schedule, existing appointments, and unavailable times. Ensure that booked or blocked slots are excluded and the response reflects accurate availability."
+  },
+  {
+    "id": "TC003",
+    "title": "admin_authentication_api",
+    "description": "Test the admin authentication API endpoints including login, logout, password reset, and token verification. Validate JWT token issuance, secure password reset flows, and access control for protected routes."
+  },
+  {
+    "id": "TC004",
+    "title": "patient_management_api",
+    "description": "Test CRUD operations for patient records via the patient management API endpoints. Validate phone number format, required fields, and proper handling of patient data."
+  },
+  {
+    "id": "TC005",
+    "title": "appointment_cancellation_api",
+    "description": "Test the secure appointment cancellation API with token verification. Ensure cancellation requests adhere to the 24-hour policy, reject last-minute cancellations within 12 hours, and verify proper status updates and error handling."
+  },
+  {
+    "id": "TC006",
+    "title": "work_schedule_management_api",
+    "description": "Verify the work schedule management API endpoints allow admin users to configure the doctor's work schedule. Validate creation, update, and retrieval of schedule data and ensure proper access control."
+  },
+  {
+    "id": "TC007",
+    "title": "unavailable_days_management_api",
+    "description": "Test the unavailable days management API to mark specific dates as holidays or vacations. Validate that these dates are excluded from available appointment slots and properly stored."
+  },
+  {
+    "id": "TC008",
+    "title": "health_insurance_management_api",
+    "description": "Test the health insurance management API endpoint to retrieve health insurance options with pricing information. Validate data accuracy and response format."
+  },
+  {
+    "id": "TC009",
+    "title": "push_notifications_api",
+    "description": "Test the push notifications API endpoints for subscribing, unsubscribing, and sending notifications. Validate subscription storage, VAPID key usage, and delivery of notifications."
+  },
+  {
+    "id": "TC010",
+    "title": "rate_limiting_api",
+    "description": "Verify the API rate limiting functionality to ensure it effectively limits excessive requests while allowing legitimate users to access the system without disruption."
+  }
+]

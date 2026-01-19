@@ -30,3 +30,31 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         return NextResponse.json({ error: "Failed to fetch unavailable day" }, { status: 500 });
     }
 }
+
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ date: string }> }) {
+    const date = (await params).date;
+    
+    try {
+        // Validate date format
+        if (!date || isNaN(Date.parse(date))) {
+            return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
+        }
+
+        const result = await query(
+            "DELETE FROM unavailable_days WHERE unavailable_date = $1 RETURNING id",
+            [date]
+        );
+        
+        if (result.rowCount === 0) {
+            return NextResponse.json({ error: "No unavailable day found for this date" }, { status: 404 });
+        }
+        
+        return NextResponse.json({ 
+            success: true,
+            message: "Unavailable day deleted successfully" 
+        }, { status: 200 });
+    } catch (error) {
+        console.error("Database query error:", error);
+        return NextResponse.json({ error: "Failed to delete unavailable day" }, { status: 500 });
+    }
+}

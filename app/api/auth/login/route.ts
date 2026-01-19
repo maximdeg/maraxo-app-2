@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         const token = generateToken(user);
 
         // Create secure response with HTTP-only cookie
-        const response = NextResponse.json({
+        const responseData: any = {
             success: true,
             user: {
                 id: user.id,
@@ -44,9 +44,20 @@ export async function POST(request: NextRequest) {
                 email: user.email,
                 role: user.role
             }
-        });
+        };
 
-        // Set secure HTTP-only cookie
+        // Optionally include token in response body for testing/API clients
+        // Check if client explicitly requests token in body (via query param or header)
+        const includeToken = request.headers.get('x-include-token') === 'true' || 
+                            new URL(request.url).searchParams.get('includeToken') === 'true';
+        
+        if (includeToken || process.env.NODE_ENV === 'development') {
+            responseData.token = token;
+        }
+
+        const response = NextResponse.json(responseData);
+
+        // Set secure HTTP-only cookie (always set for security)
         response.cookies.set('auth-token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

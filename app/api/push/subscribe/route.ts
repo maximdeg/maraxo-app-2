@@ -44,8 +44,22 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error saving push subscription:', error);
+    
+    // Provide more detailed error information
+    let errorMessage = 'Failed to save subscription';
+    if (error instanceof Error) {
+      // Check if it's a database connection error
+      if (error.message.includes('relation "push_subscriptions" does not exist')) {
+        errorMessage = 'Database table push_subscriptions does not exist. Please run database migrations.';
+      } else if (error.message.includes('duplicate key')) {
+        errorMessage = 'Subscription already exists';
+      } else {
+        errorMessage = `Database error: ${error.message}`;
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to save subscription' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

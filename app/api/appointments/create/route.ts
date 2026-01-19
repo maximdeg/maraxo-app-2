@@ -148,6 +148,7 @@ export async function POST(request: NextRequest) {
 
         const appointment_info = {
             id: newAppointment.id,
+            patient_id: patientId,
             patient_name: `${patientInfo.rows[0].first_name} ${patientInfo.rows[0].last_name}`,
             phone_number: patientInfo.rows[0].phone_number,
             visit_type_name: visitTypeInfo.rows[0]?.name || 'Unknown',
@@ -161,6 +162,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             appointment_info,
+            patient_id: patientId,
             is_existing_patient: isExistingPatient,
             message: isExistingPatient 
                 ? "Appointment scheduled successfully for existing patient."
